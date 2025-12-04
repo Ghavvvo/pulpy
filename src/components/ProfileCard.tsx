@@ -29,6 +29,9 @@ interface ProfileCardProps {
   email?: string;
   phone?: string;
   socialLinks: SocialLink[];
+  coverType?: 'color' | 'image';
+  coverImage?: string;
+  coverColor?: string;
 }
 
 const getPlatformIcon = (platform: string) => {
@@ -52,12 +55,22 @@ const ProfileCard = ({
   email,
   phone,
   socialLinks,
+  coverType = 'color',
+  coverImage,
+  coverColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 }: ProfileCardProps) => {
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden bg-card shadow-xl rounded-3xl border-0">
-      {/* Header gradient */}
-      <div className="h-24 bg-gradient-to-br from-primary via-primary/80 to-accent-foreground" />
-      
+      {/* Header gradient or image */}
+      <div
+        className="h-24"
+        style={
+          coverType === 'image' && coverImage
+            ? { backgroundImage: `url(${coverImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : { background: coverColor }
+        }
+      />
+
       {/* Profile content */}
       <div className="px-6 pb-6 -mt-12">
         <Avatar className="w-24 h-24 border-4 border-card shadow-lg">
