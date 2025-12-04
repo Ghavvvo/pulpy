@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
+import { useRef } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface ProfileData {
   name: string;
@@ -23,8 +25,50 @@ interface ProfileEditorProps {
 }
 
 const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const updateField = (field: keyof ProfileData, value: string) => {
     onProfileChange({ ...profile, [field]: value });
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Por favor selecciona una imagen válida",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "La imagen debe ser menor a 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Convertir a URL para preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateField("avatar", reader.result as string);
+      toast({
+        title: "Foto actualizada",
+        description: "Tu foto de perfil ha sido actualizada correctamente",
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -41,7 +85,14 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
               {profile.name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
-          <Button variant="outline" size="sm">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <Button variant="outline" size="sm" onClick={handleAvatarClick}>
             <Camera className="w-4 h-4 mr-2" />
             Cambiar foto
           </Button>
