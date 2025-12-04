@@ -4,7 +4,7 @@ import ProfileCard from "@/components/ProfileCard";
 import ProfileEditor from "@/components/ProfileEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
-import {Button} from "@/components/ui/button";
+import QrCard from "@/components/QrCard.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Eye, Edit3, Save} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
@@ -150,6 +150,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <ShareProfile profileUrl={profileUrl}/>
+                    <QrCard></QrCard>
                 </div>
             </main>
         </div>
