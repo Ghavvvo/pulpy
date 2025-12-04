@@ -17,12 +17,7 @@ const Header = () => {
         <nav className="hidden md:flex items-center gap-8">
           {isLanding ? (
             <>
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-                Características
-              </a>
-              <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
-                Cómo funciona
-              </a>
+
             </>
           ) : (
             <>
