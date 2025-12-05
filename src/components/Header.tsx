@@ -41,10 +41,10 @@ const Header = () => {
           {isLanding ? (
             <>
               <Button variant="ghost" asChild>
-                <Link to="/dashboard">Iniciar sesión</Link>
+                <Link to="/login">Iniciar sesión</Link>
               </Button>
               <Button asChild>
-                <Link to="/dashboard">Comenzar gratis</Link>
+                <Link to="/signup">Comenzar gratis</Link>
               </Button>
             </>
           ) : (

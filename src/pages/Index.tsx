@@ -72,7 +72,7 @@ const Index = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="text-base px-8">
-                <Link to="/dashboard">
+                <Link to="/signup">
                   Comenzar gratis
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
@@ -175,7 +175,7 @@ const Index = () => {
             Comienza a crear conexiones más significativas con tu tarjeta digital Pulpy.
           </p>
           <Button size="lg" variant="secondary" asChild className="text-base px-8">
-            <Link to="/dashboard">
+            <Link to="/signup">
               Crear mi tarjeta gratis
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
