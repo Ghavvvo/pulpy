@@ -27,6 +27,7 @@ interface ProfileData {
   coverType: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
+  cardStyle: 'professional' | 'social';
 }
 
 interface ProfileEditorProps {
@@ -141,6 +142,35 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
         <CardTitle className="text-lg">Información del Perfil</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Card Style Selector */}
+        <div className="space-y-2">
+          <Label htmlFor="cardStyle">Estilo de Tarjeta</Label>
+          <Select
+            value={profile.cardStyle}
+            onValueChange={(value: 'professional' | 'social') =>
+              onProfileChange({ ...profile, cardStyle: value })
+            }
+          >
+            <SelectTrigger id="cardStyle">
+              <SelectValue placeholder="Selecciona un estilo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="professional">
+                <div className="flex flex-col">
+                  <span className="font-medium">Profesional</span>
+                  <span className="text-xs text-muted-foreground">Diseño tipo tarjeta de presentación</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="social">
+                <div className="flex flex-col">
+                  <span className="font-medium">Social Media</span>
+                  <span className="text-xs text-muted-foreground">Estilo Linktree centrado</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Cover Image/Color */}
         <div className="space-y-4">
           <Label>Portada del Perfil</Label>
@@ -243,74 +273,101 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
         </div>
 
         {/* Form fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre completo</Label>
-            <Input
-              id="name"
-              value={profile.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              placeholder="Tu nombre"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="title">Cargo / Título</Label>
-            <Input
-              id="title"
-              value={profile.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              placeholder="Ej: CEO, Diseñador, etc."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="company">Empresa</Label>
-            <Input
-              id="company"
-              value={profile.company}
-              onChange={(e) => updateField("company", e.target.value)}
-              placeholder="Nombre de tu empresa"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Ubicación</Label>
-            <Input
-              id="location"
-              value={profile.location}
-              onChange={(e) => updateField("location", e.target.value)}
-              placeholder="Ciudad, País"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={profile.email}
-              onChange={(e) => updateField("email", e.target.value)}
-              placeholder="tu@email.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono</Label>
-            <Input
-              id="phone"
-              value={profile.phone}
-              onChange={(e) => updateField("phone", e.target.value)}
-              placeholder="+1 234 567 890"
-            />
-          </div>
-        </div>
+        {profile.cardStyle === 'professional' ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nombre completo</Label>
+                <Input
+                  id="name"
+                  value={profile.name}
+                  onChange={(e) => updateField("name", e.target.value)}
+                  placeholder="Tu nombre"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="title">Cargo / Título</Label>
+                <Input
+                  id="title"
+                  value={profile.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                  placeholder="Ej: CEO, Diseñador, etc."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Empresa</Label>
+                <Input
+                  id="company"
+                  value={profile.company}
+                  onChange={(e) => updateField("company", e.target.value)}
+                  placeholder="Nombre de tu empresa"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location">Ubicación</Label>
+                <Input
+                  id="location"
+                  value={profile.location}
+                  onChange={(e) => updateField("location", e.target.value)}
+                  placeholder="Ciudad, País"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) => updateField("email", e.target.value)}
+                  placeholder="tu@email.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  id="phone"
+                  value={profile.phone}
+                  onChange={(e) => updateField("phone", e.target.value)}
+                  placeholder="+1 234 567 890"
+                />
+              </div>
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="bio">Biografía</Label>
-          <Textarea
-            id="bio"
-            value={profile.bio}
-            onChange={(e) => updateField("bio", e.target.value)}
-            placeholder="Cuéntanos sobre ti..."
-            rows={3}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="bio">Biografía</Label>
+              <Textarea
+                id="bio"
+                value={profile.bio}
+                onChange={(e) => updateField("bio", e.target.value)}
+                placeholder="Cuéntanos sobre ti..."
+                rows={3}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                value={profile.name}
+                onChange={(e) => updateField("name", e.target.value)}
+                placeholder="Tu nombre"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio">Biografía <span className="text-muted-foreground">(opcional)</span></Label>
+              <Textarea
+                id="bio"
+                value={profile.bio}
+                onChange={(e) => updateField("bio", e.target.value)}
+                placeholder="Cuéntanos sobre ti..."
+                rows={3}
+              />
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

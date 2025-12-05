@@ -1,6 +1,7 @@
 import {useState} from "react";
 import Header from "@/components/Header";
 import ProfileCard from "@/components/ProfileCard";
+import SocialMediaCard from "@/components/SocialMediaCard";
 import ProfileEditor from "@/components/ProfileEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
@@ -28,6 +29,7 @@ interface ProfileData {
     coverType: 'color' | 'image';
     coverImage?: string;
     coverColor?: string;
+    cardStyle: 'professional' | 'social';
 }
 
 const Dashboard = () => {
@@ -42,6 +44,7 @@ const Dashboard = () => {
         avatar: "",
         coverType: 'color',
         coverColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        cardStyle: 'professional',
     });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
@@ -107,20 +110,32 @@ const Dashboard = () => {
 
                             <TabsContent value="preview" className="mt-6 lg:hidden">
                                 <div className="flex justify-center">
-                                    <ProfileCard
-                                        name={profile.name}
-                                        title={profile.title}
-                                        company={profile.company}
-                                        avatar={profile.avatar}
-                                        bio={profile.bio}
-                                        location={profile.location}
-                                        email={profile.email}
-                                        phone={profile.phone}
-                                        socialLinks={socialLinks}
-                                        coverType={profile.coverType}
-                                        coverImage={profile.coverImage}
-                                        coverColor={profile.coverColor}
-                                    />
+                                    {profile.cardStyle === 'professional' ? (
+                                        <ProfileCard
+                                            name={profile.name}
+                                            title={profile.title}
+                                            company={profile.company}
+                                            avatar={profile.avatar}
+                                            bio={profile.bio}
+                                            location={profile.location}
+                                            email={profile.email}
+                                            phone={profile.phone}
+                                            socialLinks={socialLinks}
+                                            coverType={profile.coverType}
+                                            coverImage={profile.coverImage}
+                                            coverColor={profile.coverColor}
+                                        />
+                                    ) : (
+                                        <SocialMediaCard
+                                            name={profile.name}
+                                            avatar={profile.avatar}
+                                            bio={profile.bio}
+                                            socialLinks={socialLinks}
+                                            coverType={profile.coverType}
+                                            coverImage={profile.coverImage}
+                                            coverColor={profile.coverColor}
+                                        />
+                                    )}
                                 </div>
                             </TabsContent>
                         </Tabs>
@@ -133,20 +148,32 @@ const Dashboard = () => {
                                 <Eye className="w-4 h-4"/>
                                 Vista previa en tiempo real
                             </div>
-                            <ProfileCard
-                                name={profile.name}
-                                title={profile.title}
-                                company={profile.company}
-                                avatar={profile.avatar}
-                                bio={profile.bio}
-                                location={profile.location}
-                                email={profile.email}
-                                phone={profile.phone}
-                                socialLinks={socialLinks}
-                                coverType={profile.coverType}
-                                coverImage={profile.coverImage}
-                                coverColor={profile.coverColor}
-                            />
+                            {profile.cardStyle === 'professional' ? (
+                                <ProfileCard
+                                    name={profile.name}
+                                    title={profile.title}
+                                    company={profile.company}
+                                    avatar={profile.avatar}
+                                    bio={profile.bio}
+                                    location={profile.location}
+                                    email={profile.email}
+                                    phone={profile.phone}
+                                    socialLinks={socialLinks}
+                                    coverType={profile.coverType}
+                                    coverImage={profile.coverImage}
+                                    coverColor={profile.coverColor}
+                                />
+                            ) : (
+                                <SocialMediaCard
+                                    name={profile.name}
+                                    avatar={profile.avatar}
+                                    bio={profile.bio}
+                                    socialLinks={socialLinks}
+                                    coverType={profile.coverType}
+                                    coverImage={profile.coverImage}
+                                    coverColor={profile.coverColor}
+                                />
+                            )}
                         </div>
                     </div>
                     <ShareProfile profileUrl={profileUrl}/>
