@@ -11,7 +11,7 @@ import {
   Share2,
   Users
 } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import Logo from "@/assets/logo.png";
 
 const Index = () => {
   const features = [
@@ -54,11 +54,10 @@ const Index = () => {
 
         />
 
-        <div className="container mx-auto px-4 relative z-10 pt-20">
+        <div className="container mx-auto px-4 relative z-10 pt-10">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Tu identidad digital profesional</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full ">
+                <img className="h-40" src={Logo} alt=""/>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight mb-6">

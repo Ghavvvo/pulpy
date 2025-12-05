@@ -79,9 +79,9 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Editor Section */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <Tabs value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList className="grid w-full  max-w-md grid-cols-2">
+                    <div className="lg:col-span-2  space-y-6">
+                        <Tabs  value={activeTab} onValueChange={setActiveTab}>
+                            <TabsList className="grid w-full lg:hidden  max-w-md grid-cols-2">
                                 <TabsTrigger value="edit" className="flex items-center gap-2">
                                     <Edit3 className="w-4 h-4"/>
                                     Editar
