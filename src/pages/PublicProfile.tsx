@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus, LogOut, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -39,10 +40,16 @@ const PublicProfile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, logout, user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const intendedDestination = location.state?.intendedDestination;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   useEffect(() => {
     // Simular fetch de perfil público
@@ -86,28 +93,51 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10">
-      {/* Header con opciones de login/signup */}
+      {/* Header con opciones de login/signup o logout */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="text-lg font-semibold">
             @{profile.username}
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Iniciar Sesión
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Crear Cuenta
-            </Button>
+            {isAuthenticated && user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(`/${user.username}/dashboard`)}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Mi Dashboard
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Iniciar Sesión
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Crear Cuenta
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
