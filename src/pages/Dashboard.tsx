@@ -1,4 +1,5 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import {useParams} from "react-router-dom";
 import Header from "@/components/Header";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
@@ -7,8 +8,9 @@ import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
 import QrCard from "@/components/QrCard.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Eye, Edit3, Save} from "lucide-react";
+import {Eye, Edit3} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
+import {useAuth} from "@/contexts/AuthContext";
 
 interface SocialLink {
     id: string;
@@ -33,36 +35,64 @@ interface ProfileData {
 }
 
 const Dashboard = () => {
+    const { username } = useParams();
+    const { user, updateProfile } = useAuth();
+
     const [profile, setProfile] = useState<ProfileData>({
-        name: "María García",
-        title: "Product Designer",
-        company: "TechCorp",
-        bio: "Diseñadora de producto apasionada por crear experiencias digitales que impacten positivamente en las personas.",
-        location: "Madrid, España",
-        email: "maria@techcorp.com",
-        phone: "+34 612 345 678",
-        avatar: "",
-        coverType: 'color',
-        coverColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        cardStyle: 'professional',
+        name: user?.name || "",
+        title: user?.title || "",
+        company: user?.company || "",
+        bio: user?.bio || "",
+        location: user?.location || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        avatar: user?.avatar || "",
+        coverType: user?.coverType || 'color',
+        coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        coverImage: user?.coverImage,
+        cardStyle: user?.cardStyle || 'professional',
     });
 
-    const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-        {id: "1", platform: "linkedin", url: "https://linkedin.com/in/mariagarcia", label: "LinkedIn"},
-        {id: "2", platform: "twitter", url: "https://twitter.com/mariagarcia", label: "Twitter"},
-        {id: "3", platform: "instagram", url: "https://instagram.com/mariagarcia", label: "Instagram"},
-    ]);
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
+        user?.socialLinks || []
+    );
 
     const [activeTab, setActiveTab] = useState("edit");
 
+    // Sincronizar con el usuario cuando cambie
+    useEffect(() => {
+        if (user) {
+            setProfile({
+                name: user.name,
+                title: user.title,
+                company: user.company,
+                bio: user.bio,
+                location: user.location,
+                email: user.email,
+                phone: user.phone,
+                avatar: user.avatar,
+                coverType: user.coverType,
+                coverColor: user.coverColor,
+                coverImage: user.coverImage,
+                cardStyle: user.cardStyle,
+            });
+            setSocialLinks(user.socialLinks);
+        }
+    }, [user]);
+
     const handleSave = () => {
+        // Guardar cambios en el contexto de autenticación
+        updateProfile({
+            ...profile,
+            socialLinks,
+        });
         toast({
             title: "Cambios guardados",
             description: "Tu perfil ha sido actualizado correctamente",
         });
     };
 
-    const profileUrl = "https://pulpy.app/m/mariagarcia";
+    const profileUrl = `https://pulpy.app/${username}`;
 
     return (
         <div className="min-h-screen bg-background">

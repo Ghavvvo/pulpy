@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,11 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Logo from "@/assets/logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const location = useLocation();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("maria@techcorp.com");
+  const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,15 +23,29 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulación de llamada API
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await login(email, password);
       toast({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente",
       });
-      navigate("/dashboard");
-    }, 1500);
+
+      // Redirigir a donde venía o al dashboard del usuario
+      const from = location.state?.from;
+      if (from && from !== "/login" && from !== "/signup") {
+        navigate(from);
+      } else {
+        navigate("/mariagarcia/dashboard");
+      }
+    } catch (error) {
+      toast({
+        title: "Error al iniciar sesión",
+        description: "Email: maria@techcorp.com | Contraseña: password123",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {

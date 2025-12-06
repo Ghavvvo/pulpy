@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +9,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, Check } from "lucide-react";
 import Logo from "@/assets/logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,15 +73,35 @@ const SignUp = () => {
 
     setIsLoading(true);
 
-    // Simulación de llamada API
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await signup({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
       toast({
         title: "¡Cuenta creada!",
         description: "Tu cuenta ha sido creada exitosamente",
       });
-      navigate("/dashboard");
-    }, 1500);
+
+      // Redirigir al dashboard del nuevo usuario
+      const username = formData.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      const from = location.state?.from;
+      if (from && from !== "/login" && from !== "/signup") {
+        navigate(from);
+      } else {
+        navigate(`/${username}/dashboard`);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al crear tu cuenta",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignUp = () => {
