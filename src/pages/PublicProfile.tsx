@@ -42,6 +42,7 @@ const PublicProfile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const intendedDestination = location.state?.intendedDestination;
 
   useEffect(() => {
     // Simular fetch de perfil público
@@ -95,14 +96,14 @@ const PublicProfile = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/login", { state: { from: location.pathname } })}
+              onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
             >
               <LogIn className="w-4 h-4 mr-2" />
               Iniciar Sesión
             </Button>
             <Button
               size="sm"
-              onClick={() => navigate("/signup", { state: { from: location.pathname } })}
+              onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
             >
               <UserPlus className="w-4 h-4 mr-2" />
               Crear Cuenta
@@ -155,7 +156,7 @@ const PublicProfile = () => {
           <div className="flex gap-4 mt-4">
             <Button
               className="flex-1"
-              onClick={() => navigate("/login", { state: { from: location.pathname } })}
+              onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
             >
               <LogIn className="w-4 h-4 mr-2" />
               Iniciar Sesión
@@ -163,7 +164,7 @@ const PublicProfile = () => {
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => navigate("/signup", { state: { from: location.pathname } })}
+              onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
             >
               <UserPlus className="w-4 h-4 mr-2" />
               Crear Cuenta

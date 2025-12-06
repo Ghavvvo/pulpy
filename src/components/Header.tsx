@@ -19,9 +19,8 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to={isAuthenticated && user ? `/${user.username}` : "/"} className="flex items-center gap-2">
-          <img src={logo} alt="Pulpy Logo" className="h-8" />
+          <span className="font-bold text-xl text-foreground">Pulpy</span>
         </Link>
-
         <nav className="hidden md:flex items-center gap-8">
           {isAuthenticated && user && !isLanding && (
             <>

@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
@@ -8,10 +8,11 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isAuthenticated } = useAuth();
   const { username } = useParams();
+  const location = useLocation();
 
   if (!isAuthenticated) {
-    // Redirigir al login pasando la ruta actual como parámetro
-    return <Navigate to={`/${username}`} state={{ showLoginPrompt: true }} replace />;
+    // Redirigir al perfil público pasando la ruta completa que se intentaba acceder
+    return <Navigate to={`/${username}`} state={{ showLoginPrompt: true, intendedDestination: location.pathname }} replace />;
   }
 
   // Verificar que el usuario autenticado es el dueño del perfil
