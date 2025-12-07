@@ -28,6 +28,7 @@ const Login = () => {
       toast({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente",
+        variant: "success",
       });
 
       // Redirigir a donde venía o al dashboard del usuario
