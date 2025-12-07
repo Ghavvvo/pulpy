@@ -1,13 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Zap, LogOut } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { LogOut, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isPremium, logout } = useAuth();
   const isLanding = location.pathname === "/";
 
   const handleLogout = () => {
@@ -36,6 +35,15 @@ const Header = () => {
               >
                 Estadísticas
               </Link>
+              {!isPremium && (
+                <Link
+                  to="/pricing"
+                  className={`transition-colors flex items-center gap-1 ${location.pathname === '/pricing' ? 'text-primary font-medium' : 'text-amber-600 hover:text-amber-700'}`}
+                >
+                  <Crown className="h-4 w-4" />
+                  Premium
+                </Link>
+              )}
             </>
           )}
         </nav>

@@ -7,6 +7,7 @@ import ProfileEditor from "@/components/ProfileEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
 import QrCard from "@/components/QrCard.tsx";
+import {PremiumAlert} from "@/components/PremiumAlert";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Eye, Edit3} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
@@ -97,6 +98,11 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen bg-background">
             <Header/>
+
+                {/* Premium Alert */}
+                <div className="mb-6">
+                    <PremiumAlert />
+                </div>
 
             <main className="container mx-auto px-4 pt-24 pb-12">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">

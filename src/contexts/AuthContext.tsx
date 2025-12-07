@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { Subscription, BillingCycle } from "@/lib/plans";
 
 interface User {
   id: string;
@@ -16,6 +17,7 @@ interface User {
   coverColor?: string;
   cardStyle: 'professional' | 'social';
   socialLinks: SocialLink[];
+  subscription: Subscription;
 }
 
 interface SocialLink {
@@ -28,10 +30,12 @@ interface SocialLink {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isPremium: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
+  requestUpgrade: (reference: string, billingCycle: BillingCycle) => void;
 }
 
 interface SignupData {
@@ -62,6 +66,10 @@ const MOCK_USER: User = {
     { id: "2", platform: "twitter", url: "https://twitter.com/mariagarcia", label: "Twitter" },
     { id: "3", platform: "instagram", url: "https://instagram.com/mariagarcia", label: "Instagram" },
   ],
+  subscription: {
+    plan: 'free',
+    status: 'none',
+  },
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -126,8 +134,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const requestUpgrade = (reference: string, billingCycle: BillingCycle) => {
+    if (user) {
+      const updatedUser: User = {
+        ...user,
+        subscription: {
+          plan: 'premium',
+          billingCycle,
+          status: 'pending',
+          paymentReference: reference,
+        },
+      };
+      setUser(updatedUser);
+      localStorage.setItem("pulpy_user", JSON.stringify(updatedUser));
+    }
+  };
+
+  const isPremium = user?.subscription?.plan === 'premium' && user?.subscription?.status === 'active';
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isPremium, login, signup, logout, updateProfile, requestUpgrade }}>
       {children}
     </AuthContext.Provider>
   );

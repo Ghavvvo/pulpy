@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import PublicProfile from "./pages/PublicProfile";
 import Dashboard from "./pages/Dashboard";
 import Statistics from "./pages/Statistics";
+import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/pricing" element={<Pricing />} />
 
             {/* Rutas dinámicas de usuario */}
             <Route path="/:username" element={<PublicProfile />} />
