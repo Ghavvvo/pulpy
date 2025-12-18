@@ -9,9 +9,10 @@ import ShareProfile from "@/components/ShareProfile";
 import QrCard from "@/components/QrCard.tsx";
 import {PremiumAlert} from "@/components/PremiumAlert";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Eye, Edit3} from "lucide-react";
+import {Eye, Edit3, Save} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
 import {useAuth} from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 interface SocialLink {
     id: string;
@@ -81,16 +82,24 @@ const Dashboard = () => {
         }
     }, [user]);
 
-    const handleSave = () => {
-        // Guardar cambios en el contexto de autenticación
-        updateProfile({
-            ...profile,
-            socialLinks,
-        });
-        toast({
-            title: "Cambios guardados",
-            description: "Tu perfil ha sido actualizado correctamente",
-        });
+    const handleSave = async () => {
+        try {
+            // Guardar cambios en el contexto de autenticación
+            await updateProfile({
+                ...profile,
+                socialLinks,
+            });
+            toast({
+                title: "Cambios guardados",
+                description: "Tu perfil ha sido actualizado correctamente",
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "No se pudieron guardar los cambios. Intenta de nuevo.",
+                variant: "destructive",
+            });
+        }
     };
 
     const profileUrl = `https://pulpy.app/${username}`;
@@ -140,6 +149,13 @@ const Dashboard = () => {
                                     links={socialLinks}
                                     onLinksChange={setSocialLinks}
                                 />
+
+                                <div className="flex justify-end pt-4">
+                                    <Button onClick={handleSave} className="w-full md:w-auto">
+                                        <Save className="w-4 h-4 mr-2" />
+                                        Guardar Cambios
+                                    </Button>
+                                </div>
 
                             </TabsContent>
 

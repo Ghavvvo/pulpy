@@ -5,6 +5,7 @@ import SocialMediaCard from "@/components/SocialMediaCard";
 import { Button } from "@/components/ui/button";
 import { LogIn, UserPlus, LogOut, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 import {
   Dialog,
   DialogContent,
@@ -12,29 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-// Usuario público mockeado (simulando fetch de API)
-const PUBLIC_PROFILES: Record<string, any> = {
-  mariagarcia: {
-    username: "mariagarcia",
-    name: "María García",
-    title: "Product Designer",
-    company: "TechCorp",
-    bio: "Diseñadora de producto apasionada por crear experiencias digitales que impacten positivamente en las personas.",
-    location: "Madrid, España",
-    email: "maria@techcorp.com",
-    phone: "+34 612 345 678",
-    avatar: "",
-    coverType: 'color',
-    coverColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    cardStyle: 'professional',
-    socialLinks: [
-      { id: "1", platform: "linkedin", url: "https://linkedin.com/in/mariagarcia", label: "LinkedIn" },
-      { id: "2", platform: "twitter", url: "https://twitter.com/mariagarcia", label: "Twitter" },
-      { id: "3", platform: "instagram", url: "https://instagram.com/mariagarcia", label: "Instagram" },
-    ],
-  },
-};
 
 const PublicProfile = () => {
   const { username } = useParams();
@@ -52,13 +30,68 @@ const PublicProfile = () => {
   };
 
   useEffect(() => {
-    // Simular fetch de perfil público
-    setTimeout(() => {
-      if (username && PUBLIC_PROFILES[username]) {
-        setProfile(PUBLIC_PROFILES[username]);
+    const fetchPublicProfile = async () => {
+      if (!username) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    }, 500);
+
+      try {
+        // Fetch profile with social links
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            social_links (
+              id,
+              platform,
+              url,
+              label,
+              display_order
+            )
+          `)
+          .eq('username', username)
+          .single();
+
+        if (error) throw error;
+
+        if (profile) {
+          // Map database data to component format
+          const profileData = {
+            username: profile.username,
+            name: profile.full_name || '',
+            title: profile.title || '',
+            company: profile.company || '',
+            bio: profile.bio || '',
+            location: profile.location || '',
+            email: '', // Don't expose email publicly
+            phone: profile.phone || '',
+            avatar: profile.avatar_url || '',
+            coverType: profile.cover_type || 'color',
+            coverImage: profile.cover_image_url,
+            coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            cardStyle: profile.card_style || 'professional',
+            socialLinks: (profile.social_links || [])
+              .sort((a: any, b: any) => a.display_order - b.display_order)
+              .map((link: any) => ({
+                id: link.id,
+                platform: link.platform,
+                url: link.url,
+                label: link.label || link.platform,
+              })),
+          };
+
+          setProfile(profileData);
+        }
+      } catch (error) {
+        console.error('Error fetching public profile:', error);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicProfile();
 
     // Mostrar prompt de login si viene de una ruta protegida
     if (location.state?.showLoginPrompt) {
