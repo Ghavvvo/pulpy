@@ -140,7 +140,7 @@ const PublicProfile = () => {
                   size="sm"
                   onClick={() => navigate(`/${user.username}/dashboard`)}
                 >
-                  <User className=" h-4 mr-2" />
+                  <User className="h-4 mr-2" />
                   Mi Dashboard
                 </Button>
                 <Button
@@ -160,14 +160,15 @@ const PublicProfile = () => {
                   onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
                 >
                   <LogIn className="w-4 h-4 mr-2" />
-                  Iniciar Sesión
+                  <span className="hidden sm:inline">Iniciar Sesión</span>
                 </Button>
                 <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
-                  Crear Cuenta
+                  <span className="hidden sm:inline">Crear Cuenta</span>
                 </Button>
               </>
             )}
@@ -225,7 +226,7 @@ const PublicProfile = () => {
               Iniciar Sesión
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               className="flex-1"
               onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
             >

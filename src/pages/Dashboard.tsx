@@ -229,7 +229,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <ShareProfile profileUrl={profileUrl}/>
-                    <QrCard profileUrl={profileUrl}/>
+                    <QrCard></QrCard>
                 </div>
             </main>
         </div>
