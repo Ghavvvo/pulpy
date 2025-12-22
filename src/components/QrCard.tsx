@@ -1,10 +1,12 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {QrCode, Link} from "lucide-react";
+import QRCode from "react-qr-code";
 
 
-const QrCard = () => {
+interface QrCardProps {
+    profileUrl: string;
+}
 
-
+const QrCard = ({ profileUrl }: QrCardProps) => {
     return (
         <Card className="border-0 shadow-lg">
             <CardHeader>
@@ -15,7 +17,11 @@ const QrCard = () => {
                     <div
                         className="w-48 h-48 bg-card rounded-xl shadow-inner flex items-center justify-center border-2 border-dashed border-border">
                         <div className="text-center">
-                            <QrCode className="w-24 h-24 text-primary mx-auto"/>
+                            <QRCode
+                                value={profileUrl}
+                                size={96}
+                                className="text-primary mx-auto"
+                            />
                             <p className="text-xs text-muted-foreground mt-2">QR Code</p>
                         </div>
                     </div>

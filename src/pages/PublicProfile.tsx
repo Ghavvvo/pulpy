@@ -140,7 +140,7 @@ const PublicProfile = () => {
                   size="sm"
                   onClick={() => navigate(`/${user.username}/dashboard`)}
                 >
-                  <User className="w-4 h-4 mr-2" />
+                  <User className=" h-4 mr-2" />
                   Mi Dashboard
                 </Button>
                 <Button

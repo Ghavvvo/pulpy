@@ -102,7 +102,7 @@ const Dashboard = () => {
         }
     };
 
-    const profileUrl = `https://pulpy.app/${username}`;
+    const profileUrl = `http://192.168.149.42:8080/${username}`;
 
     return (
         <div className="min-h-screen bg-background">
@@ -229,7 +229,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <ShareProfile profileUrl={profileUrl}/>
-                    <QrCard></QrCard>
+                    <QrCard profileUrl={profileUrl}/>
                 </div>
             </main>
         </div>

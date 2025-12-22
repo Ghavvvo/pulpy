@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QrCode, Copy, Link as LinkIcon, Share2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import QRCode from "react-qr-code";
 
 interface ShareProfileProps {
   profileUrl: string;
@@ -77,7 +78,11 @@ const ShareProfile = ({ profileUrl }: ShareProfileProps) => {
           <div className="flex flex-col items-center p-6 bg-secondary/30 rounded-xl">
             <div className="w-48 h-48 bg-card rounded-xl shadow-inner flex items-center justify-center border-2 border-dashed border-border">
               <div className="text-center">
-                <QrCode className="w-24 h-24 text-primary mx-auto" />
+                <QRCode
+                  value={profileUrl}
+                  size={96}
+                  className="text-primary mx-auto"
+                />
                 <p className="text-xs text-muted-foreground mt-2">QR Code</p>
               </div>
             </div>
