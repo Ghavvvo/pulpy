@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus, LogOut, User } from "lucide-react";
+import { LogIn, UserPlus, LogOut, User, Download } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import {
@@ -27,6 +27,41 @@ const PublicProfile = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleDownloadVcf = () => {
+    if (!profile) return;
+
+    // Paso 2: Crear contenido VCF
+    const vcfContent = `BEGIN:VCARD
+VERSION:3.0
+FN:${profile.name}
+TEL:${profile.phone || ''}
+EMAIL:${profile.email || ''}
+ORG:${profile.company || ''}
+TITLE:${profile.title || ''}
+URL:${window.location.href}
+NOTE:${profile.bio || ''}
+END:VCARD`;
+
+    // Paso 3: Convertir a Blob
+    const blob = new Blob([vcfContent], { type: 'text/vcard' });
+
+    // Paso 4: Crear URL temporal
+    const url = URL.createObjectURL(blob);
+
+    // Paso 5: Crear enlace invisible
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${profile.username || 'contacto'}.vcf`;
+    document.body.appendChild(link);
+
+    // Paso 6: Simular clic
+    link.click();
+
+    // Paso 7: Limpiar memoria
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -129,7 +164,7 @@ const PublicProfile = () => {
       {/* Header con opciones de login/signup o logout */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="text-lg font-semibold">
+          <div className="text-lg ">
             @{profile.username}
           </div>
           <div className="flex gap-2">
@@ -178,7 +213,7 @@ const PublicProfile = () => {
 
       {/* Content */}
       <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto flex justify-center">
+        <div className="container mx-auto flex flex-col items-center gap-6">
           {profile.cardStyle === 'social' ? (
             <SocialMediaCard
               name={profile.name}
@@ -205,6 +240,16 @@ const PublicProfile = () => {
               coverColor={profile.coverColor}
             />
           )}
+
+          <Button
+            variant="default"
+            size="lg"
+            className="w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all"
+            onClick={handleDownloadVcf}
+          >
+            <Download className="w-5 h-5 mr-2" />
+            Guardar Contacto
+          </Button>
         </div>
       </div>
 
