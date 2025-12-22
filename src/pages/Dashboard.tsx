@@ -85,7 +85,7 @@ const Dashboard = () => {
     const handleSave = async () => {
         try {
             // Guardar cambios en el contexto de autenticación
-            await updateProfile({
+             updateProfile({
                 ...profile,
                 socialLinks,
             });
@@ -229,7 +229,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <ShareProfile profileUrl={profileUrl}/>
-                    <QrCard></QrCard>
+                    <QrCard profileUrl={profileUrl}/>
                 </div>
             </main>
         </div>
