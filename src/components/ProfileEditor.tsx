@@ -156,13 +156,13 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="professional">
-                <div className="flex flex-col">
+                <div className="flex text-start flex-col">
                   <span className="font-medium">Profesional</span>
                   <span className="text-xs text-muted-foreground">Diseño tipo tarjeta de presentación</span>
                 </div>
               </SelectItem>
               <SelectItem value="social">
-                <div className="flex flex-col">
+                <div className="flex text-start flex-col">
                   <span className="font-medium">Social Media</span>
                   <span className="text-xs text-muted-foreground">Estilo Linktree centrado</span>
                 </div>
