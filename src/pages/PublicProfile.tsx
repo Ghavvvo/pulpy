@@ -212,8 +212,8 @@ END:VCARD`;
       </div>
 
       {/* Content */}
-      <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto flex flex-col items-center gap-6">
+      <div className="pt-24 h-svh pb-12 px-4 flex items-center justify-center">
+        <div className="container mx-auto flex flex-col items-center justify-center gap-6">
           {profile.cardStyle === 'social' ? (
             <SocialMediaCard
               name={profile.name}
