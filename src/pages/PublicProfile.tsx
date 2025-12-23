@@ -126,7 +126,13 @@ END:VCARD`;
       }
     };
 
-    fetchPublicProfile();
+    // Check if cached profile is available and matches the username
+    if (location.state?.cachedProfile && location.state.cachedProfile.username === username) {
+      setProfile(location.state.cachedProfile);
+      setLoading(false);
+    } else {
+      fetchPublicProfile();
+    }
 
     // Mostrar prompt de login si viene de una ruta protegida
     if (location.state?.showLoginPrompt) {

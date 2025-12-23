@@ -196,7 +196,7 @@ const Dashboard = () => {
                     {/* Preview Section (Desktop) */}
                     <div className="hidden lg:block">
                         <div className="sticky top-24">
-                            <Link to={`/${username}`} className="mb-4 mx-8 flex items-center gap-2 text-sm text-muted-foreground hover:underline cursor-pointer">
+                            <Link to={`/${username}`} state={{ cachedProfile: { username, name: profile.name, title: profile.title, company: profile.company, bio: profile.bio, location: profile.location, email: '', phone: profile.phone, avatar: profile.avatar, coverType: profile.coverType, coverImage: profile.coverImage, coverColor: profile.coverColor, cardStyle: profile.cardStyle, socialLinks } }} className="mb-4 mx-8 flex items-center gap-2 text-sm text-muted-foreground hover:underline cursor-pointer">
                                 <Eye className="w-4 h-4"/>
                                 Vista previa en tiempo real
                             </Link>
