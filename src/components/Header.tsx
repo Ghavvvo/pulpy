@@ -17,19 +17,19 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to={isAuthenticated && user ? `/${user.username}` : "/"} className="flex items-center gap-2">
+        <Link to={isAuthenticated && user ? `/${user.username+ '/dashboard'}` : "/"} className="flex items-center gap-2">
           <span className="font-bold text-xl text-foreground">Pulpy</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8">
           {isAuthenticated && user && !isLanding && (
             <>
-              <Link 
+              <Link
                 to={`/${user.username}/dashboard`}
                 className={`transition-colors ${location.pathname.includes('/dashboard') ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Dashboard
               </Link>
-              <Link 
+              <Link
                 to={`/${user.username}/statistics`}
                 className={`transition-colors ${location.pathname.includes('/statistics') ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}`}
               >
