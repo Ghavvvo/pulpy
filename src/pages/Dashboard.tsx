@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useParams, Link} from "react-router-dom";
 import Header from "@/components/Header";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
@@ -196,10 +196,10 @@ const Dashboard = () => {
                     {/* Preview Section (Desktop) */}
                     <div className="hidden lg:block">
                         <div className="sticky top-24">
-                            <div className="mb-4 mx-8 flex items-center gap-2 text-sm text-muted-foreground">
+                            <Link to={`/${username}`} className="mb-4 mx-8 flex items-center gap-2 text-sm text-muted-foreground hover:underline cursor-pointer">
                                 <Eye className="w-4 h-4"/>
                                 Vista previa en tiempo real
-                            </div>
+                            </Link>
                             {profile.cardStyle === 'professional' ? (
                                 <ProfileCard
                                     name={profile.name}
