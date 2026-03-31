@@ -4,9 +4,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Camera, Image as ImageIcon, Palette } from "lucide-react";
+import { Camera, Image as ImageIcon, Palette, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Select,
   SelectContent,
@@ -39,6 +41,9 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
+  const { uploadImage, uploading } = useImageUpload();
+  const { user } = useAuth();
+
   const updateField = (field: keyof ProfileData, value: string) => {
     onProfileChange({ ...profile, [field]: value });
   };
@@ -51,9 +56,9 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
     coverInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !user?.id) return;
 
     // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
@@ -75,21 +80,30 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
       return;
     }
 
-    // Convertir a URL para preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateField("avatar", reader.result as string);
+    try {
+      const publicUrl = await uploadImage(file, user.id, 'avatar');
+
+      if (publicUrl) {
+        updateField("avatar", publicUrl);
+        toast({
+          title: "Foto actualizada",
+          description: "Tu foto de perfil se ha subido correctamente",
+        });
+      } else {
+        throw new Error("No se pudo obtener la URL de la imagen");
+      }
+    } catch (error) {
       toast({
-        title: "Foto actualizada",
-        description: "Tu foto de perfil ha sido actualizada correctamente",
+        title: "Error",
+        description: "Hubo un problema subiendo tu foto",
+        variant: "destructive",
       });
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
-  const handleCoverFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !user?.id) return;
 
     // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
@@ -111,20 +125,29 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
       return;
     }
 
-    // Convertir a URL para preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      onProfileChange({
-        ...profile,
-        coverType: 'image',
-        coverImage: reader.result as string
+    try {
+      const publicUrl = await uploadImage(file, user.id, 'cover');
+
+      if (publicUrl) {
+        onProfileChange({
+          ...profile,
+          coverType: 'image',
+          coverImage: publicUrl
+        });
+        toast({
+          title: "Portada actualizada",
+          description: "Tu foto de portada se ha subido correctamente",
+        });
+      } else {
+        throw new Error("No se pudo obtener la URL de la imagen");
+      }
+    } catch (error) {
+       toast({
+        title: "Error",
+        description: "Hubo un problema subiendo tu portada",
+        variant: "destructive",
       });
-      toast({
-        title: "Portada actualizada",
-        description: "Tu foto de portada ha sido actualizada correctamente",
-      });
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const predefinedColors = [
@@ -265,10 +288,11 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
             accept="image/*"
             onChange={handleFileChange}
             className="hidden"
+            disabled={uploading}
           />
-          <Button variant="outline" size="sm" onClick={handleAvatarClick}>
-            <Camera className="w-4 h-4 mr-2" />
-            Cambiar foto
+          <Button variant="outline" size="sm" onClick={handleAvatarClick} disabled={uploading}>
+            {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Camera className="w-4 h-4 mr-2" />}
+            {uploading ? "Subiendo..." : "Cambiar foto"}
           </Button>
         </div>
 
@@ -374,3 +398,4 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
 };
 
 export default ProfileEditor;
+

@@ -9,7 +9,7 @@ import ShareProfile from "@/components/ShareProfile";
 import QrCard from "@/components/QrCard.tsx";
 import {PremiumAlert} from "@/components/PremiumAlert";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Eye, Edit3, Save} from "lucide-react";
+import {Eye, Edit3, Save, Loader2} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
 import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,7 @@ const Dashboard = () => {
     );
 
     const [activeTab, setActiveTab] = useState("edit");
+    const [isSaving, setIsSaving] = useState(false);
 
     // Sincronizar con el usuario cuando cambie
     useEffect(() => {
@@ -83,9 +84,10 @@ const Dashboard = () => {
     }, [user]);
 
     const handleSave = async () => {
+        setIsSaving(true);
         try {
             // Guardar cambios en el contexto de autenticación
-             updateProfile({
+             await updateProfile({
                 ...profile,
                 socialLinks,
             });
@@ -99,6 +101,8 @@ const Dashboard = () => {
                 description: "No se pudieron guardar los cambios. Intenta de nuevo.",
                 variant: "destructive",
             });
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -151,9 +155,13 @@ const Dashboard = () => {
                                 />
 
                                 <div className="flex justify-end pt-4">
-                                    <Button onClick={handleSave} className="w-full md:w-auto">
-                                        <Save className="w-4 h-4 mr-2" />
-                                        Guardar Cambios
+                                    <Button onClick={handleSave} disabled={isSaving} className="w-full md:w-auto">
+                                        {isSaving ? (
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        ) : (
+                                            <Save className="w-4 h-4 mr-2" />
+                                        )}
+                                        {isSaving ? "Guardando..." : "Guardar Cambios"}
                                     </Button>
                                 </div>
 
