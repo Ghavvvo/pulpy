@@ -121,7 +121,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
       const publicUrl = await uploadImage(file, user.id, 'cover');
 
       if (publicUrl) {
-        const nextProfile = {
+        const nextProfile: ProfileData = {
           ...profile,
           coverType: 'image',
           coverImage: publicUrl
