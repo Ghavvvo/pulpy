@@ -1,13 +1,10 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PublicMicrosite from "@/components/public/PublicMicrosite";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const PublicProfile = () => {
   const { username } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);

@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
-import ProfileCard from "@/components/ProfileCard";
-import SocialMediaCard from "@/components/SocialMediaCard";
 import ProfileEditor from "@/components/ProfileEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
