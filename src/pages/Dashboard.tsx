@@ -60,11 +60,29 @@ const Dashboard = () => {
 
     const [activeTab, setActiveTab] = useState("home");
     const [isSaving, setIsSaving] = useState(false);
+    const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const [lastSavedSnapshot, setLastSavedSnapshot] = useState(() => JSON.stringify({
+        profile: {
+            name: user?.name || "",
+            title: user?.title || "",
+            company: user?.company || "",
+            bio: user?.bio || "",
+            location: user?.location || "",
+            email: user?.email || "",
+            phone: user?.phone || "",
+            avatar: user?.avatar || "",
+            coverType: user?.coverType || 'color',
+            coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            coverImage: user?.coverImage,
+            cardStyle: user?.cardStyle || 'professional',
+        },
+        socialLinks: user?.socialLinks || [],
+    }));
 
     // Sincronizar con el usuario cuando cambie
     useEffect(() => {
         if (user) {
-            setProfile({
+            const nextProfile = {
                 name: user.name,
                 title: user.title,
                 company: user.company,
@@ -77,32 +95,57 @@ const Dashboard = () => {
                 coverColor: user.coverColor,
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
-            });
+            };
+
+            setProfile(nextProfile);
             setSocialLinks(user.socialLinks);
+            setLastSavedSnapshot(JSON.stringify({ profile: nextProfile, socialLinks: user.socialLinks }));
+            setLastSavedAt(null);
         }
     }, [user]);
 
-    const handleSave = async () => {
+    const hasUnsavedChanges = JSON.stringify({ profile, socialLinks }) !== lastSavedSnapshot;
+
+    const persistProfile = async (
+        nextProfile: ProfileData,
+        nextSocialLinks: SocialLink[],
+        successDescription: string,
+    ) => {
         setIsSaving(true);
         try {
-            // Guardar cambios en el contexto de autenticación
-             await updateProfile({
-                ...profile,
-                socialLinks,
+            await updateProfile({
+                ...nextProfile,
+                socialLinks: nextSocialLinks,
             });
+
+            setLastSavedSnapshot(JSON.stringify({ profile: nextProfile, socialLinks: nextSocialLinks }));
+            setLastSavedAt(new Date());
+
             toast({
                 title: "Cambios guardados",
-                description: "Tu perfil ha sido actualizado correctamente",
+                description: successDescription,
             });
+
+            return true;
         } catch (error) {
             toast({
                 title: "Error",
                 description: "No se pudieron guardar los cambios. Intenta de nuevo.",
                 variant: "destructive",
             });
+
+            return false;
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleSave = async () => {
+        await persistProfile(profile, socialLinks, "Tu perfil ha sido actualizado correctamente");
+    };
+
+    const handleAutoSaveProfile = async (nextProfile: ProfileData) => {
+        return persistProfile(nextProfile, socialLinks, "Los cambios de imagen se guardaron automáticamente");
     };
 
     const profileUrl = `${window.location.origin}/${username}`;
@@ -149,16 +192,30 @@ const Dashboard = () => {
                     </TabsContent>
 
                     <TabsContent value="card" className="space-y-8">
+                        <div className="sticky top-24 z-10 rounded-xl border bg-card/95 p-3 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-foreground">Editor de tarjeta</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {hasUnsavedChanges
+                                            ? "Tienes cambios pendientes por guardar"
+                                            : lastSavedAt
+                                                ? `Último guardado a las ${lastSavedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+                                                : "No hay cambios pendientes"}
+                                    </p>
+                                </div>
+
+                                <Button onClick={handleSave} disabled={isSaving || !hasUnsavedChanges} className="w-full sm:w-auto">
+                                    {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                                    {isSaving ? "Guardando..." : "Guardar Cambios"}
+                                </Button>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                             <div className="xl:col-span-2 space-y-6">
-                                <ProfileEditor profile={profile} onProfileChange={setProfile} />
+                                <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
-                                <div className="flex justify-end pt-2">
-                                    <Button onClick={handleSave} disabled={isSaving} className="w-full md:w-auto">
-                                        {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                                        {isSaving ? "Guardando..." : "Guardar Cambios"}
-                                    </Button>
-                                </div>
                             </div>
                             <div className="xl:col-span-1">
                                 <div className="sticky top-24">

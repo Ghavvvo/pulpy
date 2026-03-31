@@ -35,14 +35,37 @@ interface ProfileData {
 interface ProfileEditorProps {
   profile: ProfileData;
   onProfileChange: (profile: ProfileData) => void;
+  onAutoSave?: (profile: ProfileData) => Promise<boolean>;
 }
 
-const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
+const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
   const { uploadImage, uploading } = useImageUpload();
   const { user } = useAuth();
+
+  const validateImage = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Por favor selecciona una imagen válida",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "La imagen debe ser menor a 5MB",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
 
   const updateField = (field: keyof ProfileData, value: string) => {
     onProfileChange({ ...profile, [field]: value });
@@ -60,34 +83,21 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
 
-    // Validar tipo de archivo
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "Por favor selecciona una imagen válida",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validar tamaño (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "La imagen debe ser menor a 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!validateImage(file)) return;
 
     try {
       const publicUrl = await uploadImage(file, user.id, 'avatar');
 
       if (publicUrl) {
-        updateField("avatar", publicUrl);
+        const nextProfile = { ...profile, avatar: publicUrl };
+        onProfileChange(nextProfile);
+        const saved = onAutoSave ? await onAutoSave(nextProfile) : true;
         toast({
-          title: "Foto actualizada",
-          description: "Tu foto de perfil se ha subido correctamente",
+          title: saved ? "Foto guardada" : "Foto actualizada",
+          description: saved
+            ? "Tu foto se guardó automáticamente"
+            : "Tu foto se subió, pero no se pudo guardar automáticamente",
+          variant: saved ? "default" : "destructive",
         });
       } else {
         throw new Error("No se pudo obtener la URL de la imagen");
@@ -105,38 +115,27 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
 
-    // Validar tipo de archivo
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "Por favor selecciona una imagen válida",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validar tamaño (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "La imagen debe ser menor a 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!validateImage(file)) return;
 
     try {
       const publicUrl = await uploadImage(file, user.id, 'cover');
 
       if (publicUrl) {
-        onProfileChange({
+        const nextProfile: ProfileData = {
           ...profile,
           coverType: 'image',
           coverImage: publicUrl
-        });
+        };
+
+        onProfileChange(nextProfile);
+        const saved = onAutoSave ? await onAutoSave(nextProfile) : true;
+
         toast({
-          title: "Portada actualizada",
-          description: "Tu foto de portada se ha subido correctamente",
+          title: saved ? "Portada guardada" : "Portada actualizada",
+          description: saved
+            ? "Tu portada se guardó automáticamente"
+            : "Tu portada se subió, pero no se pudo guardar automáticamente",
+          variant: saved ? "default" : "destructive",
         });
       } else {
         throw new Error("No se pudo obtener la URL de la imagen");
@@ -163,6 +162,7 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
     <Card className="border-0 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg">Información del Perfil</CardTitle>
+        <p className="text-sm text-muted-foreground">Las imágenes se guardan automáticamente al subirlas.</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Card Style Selector */}
@@ -213,9 +213,10 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
                 size="sm"
                 onClick={handleCoverClick}
                 className="text-xs"
+                disabled={uploading}
               >
-                <ImageIcon className="w-3 h-3 mr-1" />
-                Cambiar imagen
+                {uploading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <ImageIcon className="w-3 h-3 mr-1" />}
+                {uploading ? "Subiendo..." : "Cambiar imagen"}
               </Button>
             </div>
           </div>
@@ -235,6 +236,7 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
               size="sm"
               onClick={handleCoverClick}
               className="flex-1"
+              disabled={uploading}
             >
               <ImageIcon className="w-4 h-4 mr-2" />
               Subir imagen
@@ -244,6 +246,7 @@ const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
               size="sm"
               onClick={() => onProfileChange({ ...profile, coverType: 'color' })}
               className="flex-1"
+              disabled={uploading}
             >
               <Palette className="w-4 h-4 mr-2" />
               Color sólido
