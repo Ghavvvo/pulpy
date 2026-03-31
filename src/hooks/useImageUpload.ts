@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export const useImageUpload = () => {
-  const [uploading, setUploading] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const uploadImage = async (file: File, userId: string, type: 'avatar' | 'cover'): Promise<string | null> => {
     try {
-      setUploading(true);
+      if (type === 'avatar') {
+        setUploadingAvatar(true);
+      } else {
+        setUploadingCover(true);
+      }
       setError(null);
 
       // Validate file type
@@ -46,7 +51,11 @@ export const useImageUpload = () => {
       console.error('Upload error:', err);
       return null;
     } finally {
-      setUploading(false);
+      if (type === 'avatar') {
+        setUploadingAvatar(false);
+      } else {
+        setUploadingCover(false);
+      }
     }
   };
 
@@ -76,7 +85,8 @@ export const useImageUpload = () => {
   return {
     uploadImage,
     deleteImage,
-    uploading,
+    uploadingAvatar,
+    uploadingCover,
     error,
   };
 };

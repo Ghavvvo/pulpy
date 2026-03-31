@@ -42,7 +42,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const { uploadImage, uploading } = useImageUpload();
+  const { uploadImage, uploadingAvatar, uploadingCover } = useImageUpload();
   const { user } = useAuth();
 
   const validateImage = (file: File) => {
@@ -213,10 +213,10 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
                 size="sm"
                 onClick={handleCoverClick}
                 className="text-xs"
-                disabled={uploading}
+                disabled={uploadingCover}
               >
-                {uploading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <ImageIcon className="w-3 h-3 mr-1" />}
-                {uploading ? "Subiendo..." : "Cambiar imagen"}
+                {uploadingCover ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <ImageIcon className="w-3 h-3 mr-1" />}
+                {uploadingCover ? "Subiendo..." : "Cambiar imagen"}
               </Button>
             </div>
           </div>
@@ -236,7 +236,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
               size="sm"
               onClick={handleCoverClick}
               className="flex-1"
-              disabled={uploading}
+              disabled={uploadingCover}
             >
               <ImageIcon className="w-4 h-4 mr-2" />
               Subir imagen
@@ -246,7 +246,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
               size="sm"
               onClick={() => onProfileChange({ ...profile, coverType: 'color' })}
               className="flex-1"
-              disabled={uploading}
+              disabled={uploadingCover}
             >
               <Palette className="w-4 h-4 mr-2" />
               Color sólido
@@ -291,11 +291,11 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave }: ProfileEditorPr
             accept="image/*"
             onChange={handleFileChange}
             className="hidden"
-            disabled={uploading}
+            disabled={uploadingAvatar}
           />
-          <Button variant="outline" size="sm" onClick={handleAvatarClick} disabled={uploading}>
-            {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Camera className="w-4 h-4 mr-2" />}
-            {uploading ? "Subiendo..." : "Cambiar foto"}
+          <Button variant="outline" size="sm" onClick={handleAvatarClick} disabled={uploadingAvatar}>
+            {uploadingAvatar ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Camera className="w-4 h-4 mr-2" />}
+            {uploadingAvatar ? "Subiendo..." : "Cambiar foto"}
           </Button>
         </div>
 
