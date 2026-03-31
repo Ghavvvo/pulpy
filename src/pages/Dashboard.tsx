@@ -191,25 +191,16 @@ const Dashboard = () => {
                         <DashboardHomeTab profileUrl={profileUrl} onOpenShareCenter={() => setActiveTab("share")} />
                     </TabsContent>
 
-                    <TabsContent value="card" className="space-y-8">
-                        <div className="sticky top-24 z-10 rounded-xl border bg-card/95 p-3 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-foreground">Editor de tarjeta</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {hasUnsavedChanges
-                                            ? "Tienes cambios pendientes por guardar"
-                                            : lastSavedAt
-                                                ? `Último guardado a las ${lastSavedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
-                                                : "No hay cambios pendientes"}
-                                    </p>
-                                </div>
-
-                                <Button onClick={handleSave} disabled={isSaving || !hasUnsavedChanges} className="w-full sm:w-auto">
-                                    {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                                    {isSaving ? "Guardando..." : "Guardar Cambios"}
-                                </Button>
-                            </div>
+                    <TabsContent value="card" className="space-y-8 pb-28">
+                        <div className="rounded-xl border bg-card p-4">
+                            <p className="text-sm font-medium text-foreground">Editor de tarjeta</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {hasUnsavedChanges
+                                    ? "Edita con tranquilidad: guarda cuando termines desde la barra inferior"
+                                    : lastSavedAt
+                                        ? `Último guardado a las ${lastSavedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+                                        : "No hay cambios pendientes"}
+                            </p>
                         </div>
 
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -229,6 +220,27 @@ const Dashboard = () => {
                         <ShareProfile profileUrl={profileUrl} isPremium={isPremium} />
                     </TabsContent>
                 </Tabs>
+
+                {activeTab === "card" && (
+                    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+                        <div className="container mx-auto px-4 py-3">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="text-xs sm:text-sm text-muted-foreground">
+                                    {hasUnsavedChanges
+                                        ? "Tienes cambios pendientes por guardar"
+                                        : lastSavedAt
+                                            ? `Todo guardado · ${lastSavedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+                                            : "Todo guardado"}
+                                </p>
+
+                                <Button onClick={handleSave} disabled={isSaving || !hasUnsavedChanges} className="w-full sm:w-auto">
+                                    {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                                    {isSaving ? "Guardando..." : "Guardar Cambios"}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
