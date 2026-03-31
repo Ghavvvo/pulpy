@@ -1,33 +1,16 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ProfileCard from "@/components/ProfileCard";
-import SocialMediaCard from "@/components/SocialMediaCard";
+import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus, LogOut, User, Download } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { Download } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const PublicProfile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, logout, user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const intendedDestination = location.state?.intendedDestination;
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   const handleDownloadVcf = () => {
     if (!profile) return;
@@ -134,10 +117,6 @@ END:VCARD`;
       fetchPublicProfile();
     }
 
-    // Mostrar prompt de login si viene de una ruta protegida
-    if (location.state?.showLoginPrompt) {
-      setShowLoginPrompt(true);
-    }
   }, [username, location]);
 
   if (loading) {
@@ -165,130 +144,7 @@ END:VCARD`;
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10">
-      {/* Header con opciones de login/signup o logout */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="text-lg ">
-            @{profile.username}
-          </div>
-          <div className="flex gap-2">
-            {isAuthenticated && user ? (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate(`/${user.username}/dashboard`)}
-                >
-                  <User className="h-4 mr-2" />
-                  Mi Dashboard
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Cerrar Sesión
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Iniciar Sesión</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Crear Cuenta</span>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="pt-24 h-svh pb-12 px-4 flex items-center justify-center">
-        <div className="container mx-auto flex flex-col items-center justify-center gap-6">
-          {profile.cardStyle === 'social' ? (
-            <SocialMediaCard
-              name={profile.name}
-              avatar={profile.avatar}
-              bio={profile.bio}
-              socialLinks={profile.socialLinks}
-              coverType={profile.coverType}
-              coverImage={profile.coverImage}
-              coverColor={profile.coverColor}
-            />
-          ) : (
-            <ProfileCard
-              name={profile.name}
-              title={profile.title}
-              company={profile.company}
-              avatar={profile.avatar}
-              bio={profile.bio}
-              location={profile.location}
-              email={profile.email}
-              phone={profile.phone}
-              socialLinks={profile.socialLinks}
-              coverType={profile.coverType}
-              coverImage={profile.coverImage}
-              coverColor={profile.coverColor}
-            />
-          )}
-
-          <Button
-            variant="default"
-            size="lg"
-            className="w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-all"
-            onClick={handleDownloadVcf}
-          >
-            <Download className="w-5 h-5 mr-2" />
-            Guardar Contacto
-          </Button>
-        </div>
-      </div>
-
-      {/* Login Prompt Dialog */}
-      <Dialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Acceso restringido</DialogTitle>
-            <DialogDescription>
-              Necesitas iniciar sesión para acceder a esta sección.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-4 mt-4">
-            <Button
-              className="flex-1"
-              onClick={() => navigate("/login", { state: { from: intendedDestination || location.pathname } })}
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Iniciar Sesión
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex-1"
-              onClick={() => navigate("/signup", { state: { from: intendedDestination || location.pathname } })}
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Crear Cuenta
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+  return <PublicMicrosite profile={profile} onDownloadVcf={handleDownloadVcf} />;
 };
 
 export default PublicProfile;
