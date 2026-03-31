@@ -33,7 +33,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isPremium: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   // Fetch user profile data from Supabase
-  const fetchUserProfile = async (authUser: SupabaseUser) => {
+  const fetchUserProfile = async (authUser: SupabaseUser): Promise<User> => {
     try {
       // Fetch profile data
       const { data: profile, error: profileError } = await supabase
@@ -117,10 +117,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(userData);
       setIsAuthenticated(true);
+      return userData;
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setUser(null);
       setIsAuthenticated(false);
+      throw error;
     }
   };
 
@@ -147,7 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -155,8 +157,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) throw error;
     if (data.user) {
-      await fetchUserProfile(data.user);
+      return await fetchUserProfile(data.user);
     }
+    throw new Error('Login failed');
   };
 
   const signup = async (data: SignupData) => {
@@ -296,4 +299,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

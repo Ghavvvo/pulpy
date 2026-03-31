@@ -24,7 +24,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      const userData = await login(email, password);
       toast({
         title: "¡Bienvenido de vuelta!",
         description: "Has iniciado sesión correctamente",
@@ -36,7 +36,7 @@ const Login = () => {
       if (from && from !== "/login" && from !== "/signup") {
         navigate(from);
       } else {
-        navigate("/mariagarcia/dashboard");
+        navigate(`/${userData.username}/dashboard`);
       }
     } catch (error) {
       toast({
