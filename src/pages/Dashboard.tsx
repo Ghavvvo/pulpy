@@ -1,18 +1,17 @@
-import {useState, useEffect} from "react";
-import {useParams, Link} from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
-import ProfileCard from "@/components/ProfileCard";
-import SocialMediaCard from "@/components/SocialMediaCard";
 import ProfileEditor from "@/components/ProfileEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
-import QrCard from "@/components/QrCard.tsx";
 import {PremiumAlert} from "@/components/PremiumAlert";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Eye, Edit3, Save, Loader2} from "lucide-react";
+import { Edit3, Save, Loader2, Home, Share2 } from "lucide-react";
 import {toast} from "@/hooks/use-toast";
 import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
+import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 
 interface SocialLink {
     id: string;
@@ -38,7 +37,7 @@ interface ProfileData {
 
 const Dashboard = () => {
     const { username } = useParams();
-    const { user, updateProfile } = useAuth();
+    const { user, updateProfile, isPremium } = useAuth();
 
     const [profile, setProfile] = useState<ProfileData>({
         name: user?.name || "",
@@ -59,7 +58,7 @@ const Dashboard = () => {
         user?.socialLinks || []
     );
 
-    const [activeTab, setActiveTab] = useState("edit");
+    const [activeTab, setActiveTab] = useState("home");
     const [isSaving, setIsSaving] = useState(false);
 
     // Sincronizar con el usuario cuando cambie
@@ -106,7 +105,7 @@ const Dashboard = () => {
         }
     };
 
-    const profileUrl = `http://192.168.149.42:8080/${username}`;
+    const profileUrl = `${window.location.origin}/${username}`;
 
     return (
         <div className="min-h-screen bg-background">
@@ -129,116 +128,50 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Editor Section */}
-                    <div className="lg:col-span-2  space-y-6">
-                        <Tabs  value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList className="grid w-full lg:hidden  max-w-md grid-cols-2">
-                                <TabsTrigger value="edit" className="flex items-center gap-2">
-                                    <Edit3 className="w-4 h-4"/>
-                                    Editar
-                                </TabsTrigger>
-                                <TabsTrigger value="preview" className="flex items-center lg:hidden">
-                                    <Eye className="w-4 h-4"/>
-                                    Vista previa
-                                </TabsTrigger>
-                            </TabsList>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                    <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+                        <TabsTrigger value="home" className="py-2.5">
+                            <Home className="w-4 h-4 mr-2" />
+                            Inicio
+                        </TabsTrigger>
+                        <TabsTrigger value="card" className="py-2.5">
+                            <Edit3 className="w-4 h-4 mr-2" />
+                            Mi Tarjeta
+                        </TabsTrigger>
+                        <TabsTrigger value="share" className="py-2.5">
+                            <Share2 className="w-4 h-4 mr-2" />
+                            QR & Compartir
+                        </TabsTrigger>
+                    </TabsList>
 
-                            <TabsContent value="edit" className="mt-6 space-y-6">
-                                <ProfileEditor
-                                    profile={profile}
-                                    onProfileChange={setProfile}
-                                />
-                                <SocialLinkEditor
-                                    links={socialLinks}
-                                    onLinksChange={setSocialLinks}
-                                />
+                    <TabsContent value="home" className="space-y-6">
+                        <DashboardHomeTab profileUrl={profileUrl} onOpenShareCenter={() => setActiveTab("share")} />
+                    </TabsContent>
 
-                                <div className="flex justify-end pt-4">
+                    <TabsContent value="card" className="space-y-8">
+                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                            <div className="xl:col-span-2 space-y-6">
+                                <ProfileEditor profile={profile} onProfileChange={setProfile} />
+                                <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
+                                <div className="flex justify-end pt-2">
                                     <Button onClick={handleSave} disabled={isSaving} className="w-full md:w-auto">
-                                        {isSaving ? (
-                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        ) : (
-                                            <Save className="w-4 h-4 mr-2" />
-                                        )}
+                                        {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                                         {isSaving ? "Guardando..." : "Guardar Cambios"}
                                     </Button>
                                 </div>
-
-                            </TabsContent>
-
-
-                            <TabsContent value="preview" className="mt-6 lg:hidden">
-                                <div className="flex justify-center">
-                                    {profile.cardStyle === 'professional' ? (
-                                        <ProfileCard
-                                            name={profile.name}
-                                            title={profile.title}
-                                            company={profile.company}
-                                            avatar={profile.avatar}
-                                            bio={profile.bio}
-                                            location={profile.location}
-                                            email={profile.email}
-                                            phone={profile.phone}
-                                            socialLinks={socialLinks}
-                                            coverType={profile.coverType}
-                                            coverImage={profile.coverImage}
-                                            coverColor={profile.coverColor}
-                                        />
-                                    ) : (
-                                        <SocialMediaCard
-                                            name={profile.name}
-                                            avatar={profile.avatar}
-                                            bio={profile.bio}
-                                            socialLinks={socialLinks}
-                                            coverType={profile.coverType}
-                                            coverImage={profile.coverImage}
-                                            coverColor={profile.coverColor}
-                                        />
-                                    )}
+                            </div>
+                            <div className="xl:col-span-1">
+                                <div className="sticky top-24">
+                                    <ProfilePreviewPanel username={username} profile={profile} socialLinks={socialLinks} />
                                 </div>
-                            </TabsContent>
-                        </Tabs>
-                    </div>
-
-                    {/* Preview Section (Desktop) */}
-                    <div className="hidden lg:block">
-                        <div className="sticky top-24">
-                            <Link to={`/${username}`} state={{ cachedProfile: { username, name: profile.name, title: profile.title, company: profile.company, bio: profile.bio, location: profile.location, email: '', phone: profile.phone, avatar: profile.avatar, coverType: profile.coverType, coverImage: profile.coverImage, coverColor: profile.coverColor, cardStyle: profile.cardStyle, socialLinks } }} className="mb-4 mx-8 flex items-center gap-2 text-sm text-muted-foreground hover:underline cursor-pointer">
-                                <Eye className="w-4 h-4"/>
-                                Vista previa en tiempo real
-                            </Link>
-                            {profile.cardStyle === 'professional' ? (
-                                <ProfileCard
-                                    name={profile.name}
-                                    title={profile.title}
-                                    company={profile.company}
-                                    avatar={profile.avatar}
-                                    bio={profile.bio}
-                                    location={profile.location}
-                                    email={profile.email}
-                                    phone={profile.phone}
-                                    socialLinks={socialLinks}
-                                    coverType={profile.coverType}
-                                    coverImage={profile.coverImage}
-                                    coverColor={profile.coverColor}
-                                />
-                            ) : (
-                                <SocialMediaCard
-                                    name={profile.name}
-                                    avatar={profile.avatar}
-                                    bio={profile.bio}
-                                    socialLinks={socialLinks}
-                                    coverType={profile.coverType}
-                                    coverImage={profile.coverImage}
-                                    coverColor={profile.coverColor}
-                                />
-                            )}
+                            </div>
                         </div>
-                    </div>
-                    <ShareProfile profileUrl={profileUrl}/>
-                    <QrCard profileUrl={profileUrl}/>
-                </div>
+                    </TabsContent>
+
+                    <TabsContent value="share" className="space-y-6">
+                        <ShareProfile profileUrl={profileUrl} isPremium={isPremium} />
+                    </TabsContent>
+                </Tabs>
             </main>
         </div>
     );
