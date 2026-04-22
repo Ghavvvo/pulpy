@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  QrCode,
   Copy,
   Link as LinkIcon,
   Share2,
@@ -14,6 +13,13 @@ import {
   Send,
   Linkedin,
   Twitter,
+  Facebook,
+  Phone,
+  Slack,
+  Hash,
+  Bookmark,
+  Image as ImageIcon,
+  QrCode,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import QRCode from "react-qr-code";
@@ -130,15 +136,42 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
     }
   };
 
-  const openChannel = (channel: "whatsapp" | "email" | "sms" | "linkedin" | "twitter") => {
+  type Channel =
+    | "whatsapp"
+    | "email"
+    | "sms"
+    | "linkedin"
+    | "twitter"
+    | "telegram"
+    | "facebook"
+    | "messenger"
+    | "reddit"
+    | "pinterest"
+    | "tumblr"
+    | "skype"
+    | "slack"
+    | "line"
+    | "viber";
+
+  const openChannel = (channel: Channel) => {
     const encodedUrl = encodeURIComponent(profileUrl);
     const encodedText = encodeURIComponent("Mira mi tarjeta digital Pulpy");
-    const channels: Record<typeof channel, string> = {
+    const channels: Record<Channel, string> = {
       whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
       email: `mailto:?subject=Mi%20tarjeta%20digital&body=${encodedText}%20${encodedUrl}`,
       sms: `sms:?body=${encodedText}%20${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      messenger: `https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=291494419107518&redirect_uri=${encodedUrl}`,
+      reddit: `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedText}`,
+      pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`,
+      tumblr: `https://www.tumblr.com/share/link?url=${encodedUrl}&description=${encodedText}`,
+      skype: `https://web.skype.com/share?url=${encodedUrl}&text=${encodedText}`,
+      slack: `https://slack.com/intl/en/share?url=${encodedUrl}&text=${encodedText}`,
+      line: `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`,
+      viber: `viber://forward?text=${encodedText}%20${encodedUrl}`,
     };
 
     window.open(channels[channel], "_blank", "noopener,noreferrer");
@@ -192,17 +225,21 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
 
         <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-3">
           <p className="text-sm font-medium text-card-foreground">Canales de distribución</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             <Button variant="outline" size="sm" onClick={() => openChannel("whatsapp")}>
               <MessageCircle className="w-4 h-4 mr-2" />
               WhatsApp
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("telegram")}>
+              <Send className="w-4 h-4 mr-2" />
+              Telegram
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("email")}>
               <Mail className="w-4 h-4 mr-2" />
               Email
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("sms")}>
-              <Send className="w-4 h-4 mr-2" />
+              <Phone className="w-4 h-4 mr-2" />
               SMS
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("linkedin")}>
@@ -212,6 +249,46 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
             <Button variant="outline" size="sm" onClick={() => openChannel("twitter")}>
               <Twitter className="w-4 h-4 mr-2" />
               Twitter/X
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("facebook")}>
+              <Facebook className="w-4 h-4 mr-2" />
+              Facebook
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("messenger")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Messenger
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("reddit")}>
+              <Hash className="w-4 h-4 mr-2" />
+              Reddit
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("pinterest")}>
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Pinterest
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("tumblr")}>
+              <Bookmark className="w-4 h-4 mr-2" />
+              Tumblr
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("slack")}>
+              <Slack className="w-4 h-4 mr-2" />
+              Slack
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("skype")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Skype
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("line")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              LINE
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("viber")}>
+              <Phone className="w-4 h-4 mr-2" />
+              Viber
+            </Button>
+            <Button variant="outline" size="sm" onClick={downloadPng}>
+              <QrCode className="w-4 h-4 mr-2" />
+              QR imagen
             </Button>
             <Button variant="outline" size="sm" onClick={copyToClipboard}>
               <Copy className="w-4 h-4 mr-2" />
