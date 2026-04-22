@@ -1,4 +1,3 @@
-import { Sparkles } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 interface PulpyWatermarkProps {
@@ -12,24 +11,29 @@ const PulpyWatermark = ({ variant = "card" }: PulpyWatermarkProps) => {
         href="https://pulpy.app"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur border border-border shadow-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 inline-flex flex-col items-center gap-0.5"
       >
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
-        Hecho con <span className="font-semibold text-foreground">Pulpy</span>
+        <img src={logo} alt="Pulpy" className="w-6 h-6 object-contain" />
+        <span className="text-[10px] font-medium text-muted-foreground">
+          Hecho con <span className="font-semibold text-foreground">Pulpy</span>
+        </span>
       </a>
     );
   }
 
-  // "card" variant: logo del pulpo en la esquina superior derecha de la cover
+  // "card" variant: logo del pulpo + texto, esquina inferior derecha, sin contorno
   return (
     <a
       href="https://pulpy.app"
       target="_blank"
       rel="noopener noreferrer"
       title="Hecho con Pulpy"
-      className="absolute top-3 right-3 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card/80 backdrop-blur border border-border shadow-md hover:bg-card transition-colors"
+      className="absolute bottom-3 right-3 z-10 inline-flex flex-col items-center gap-0.5 opacity-80 hover:opacity-100 transition-opacity"
     >
-      <img src={logo} alt="Pulpy" className="w-5 h-5 object-contain" />
+      <img src={logo} alt="Pulpy" className="w-7 h-7 object-contain" />
+      <span className="text-[9px] leading-none font-medium text-muted-foreground whitespace-nowrap">
+        Hecho con <span className="font-semibold text-foreground">Pulpy</span>
+      </span>
     </a>
   );
 };
