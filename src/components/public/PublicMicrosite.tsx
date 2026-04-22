@@ -30,6 +30,7 @@ interface PublicProfileData {
 interface PublicMicrositeProps {
   profile: PublicProfileData;
   onDownloadVcf: () => void;
+  showWatermark?: boolean;
 }
 
 const getPlatformIcon = (platform: string) => {
