@@ -7,6 +7,7 @@ import {
   Globe, 
   Github,
 } from "lucide-react";
+import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
   id: string;
