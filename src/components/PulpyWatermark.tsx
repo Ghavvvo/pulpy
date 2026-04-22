@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 interface PulpyWatermarkProps {
   variant?: "card" | "floating";
@@ -19,18 +20,17 @@ const PulpyWatermark = ({ variant = "card" }: PulpyWatermarkProps) => {
     );
   }
 
+  // "card" variant: logo del pulpo en la esquina superior derecha de la cover
   return (
-    <div className="border-t border-border bg-secondary/30 px-6 py-3 flex items-center justify-center">
-      <a
-        href="https://pulpy.app"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <Sparkles className="w-3 h-3 text-primary" />
-        Hecho con <span className="font-semibold text-foreground">Pulpy</span>
-      </a>
-    </div>
+    <a
+      href="https://pulpy.app"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Hecho con Pulpy"
+      className="absolute top-3 right-3 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-card/80 backdrop-blur border border-border shadow-md hover:bg-card transition-colors"
+    >
+      <img src={logo} alt="Pulpy" className="w-5 h-5 object-contain" />
+    </a>
   );
 };
 
