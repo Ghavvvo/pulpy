@@ -144,7 +144,7 @@ END:VCARD`;
     );
   }
 
-  return <PublicMicrosite profile={profile} onDownloadVcf={handleDownloadVcf} />;
+  return <PublicMicrosite profile={profile} onDownloadVcf={handleDownloadVcf} showWatermark={!profile.isPremium} />;
 };
 
 export default PublicProfile;
