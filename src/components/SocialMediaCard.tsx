@@ -94,7 +94,6 @@ const SocialMediaCard = ({
           ))}
         </div>
       </div>
-      {showWatermark && <PulpyWatermark variant="card" />}
     </Card>
   );
 };
