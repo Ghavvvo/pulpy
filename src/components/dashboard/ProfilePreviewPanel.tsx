@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SocialLink {
   id: string;
@@ -33,6 +34,8 @@ interface ProfilePreviewPanelProps {
 }
 
 const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewPanelProps) => {
+  const { isPremium } = useAuth();
+  const showWatermark = !isPremium;
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 shadow-sm">
@@ -88,6 +91,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
           coverType={profile.coverType}
           coverImage={profile.coverImage}
           coverColor={profile.coverColor}
+          showWatermark={showWatermark}
         />
       ) : (
         <SocialMediaCard
@@ -98,6 +102,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
           coverType={profile.coverType}
           coverImage={profile.coverImage}
           coverColor={profile.coverColor}
+          showWatermark={showWatermark}
         />
       )}
     </div>

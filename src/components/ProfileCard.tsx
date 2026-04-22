@@ -11,6 +11,7 @@ import {
   Phone,
   MapPin
 } from "lucide-react";
+import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
   id: string;
@@ -32,6 +33,7 @@ interface ProfileCardProps {
   coverType?: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
+  showWatermark?: boolean;
 }
 
 const getPlatformIcon = (platform: string) => {
@@ -58,6 +60,7 @@ const ProfileCard = ({
   coverType = 'color',
   coverImage,
   coverColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  showWatermark = false,
 }: ProfileCardProps) => {
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden bg-card shadow-xl rounded-3xl border-0">
@@ -132,6 +135,7 @@ const ProfileCard = ({
           ))}
         </div>
       </div>
+      {showWatermark && <PulpyWatermark variant="card" />}
     </Card>
   );
 };
