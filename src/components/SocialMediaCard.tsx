@@ -49,7 +49,8 @@ const SocialMediaCard = ({
   showWatermark = false,
 }: SocialMediaCardProps) => {
   return (
-    <Card className="w-full max-w-sm mx-auto overflow-hidden bg-card shadow-xl rounded-3xl border-0">
+    <Card className="relative w-full max-w-sm mx-auto overflow-hidden bg-card shadow-xl rounded-3xl border-0">
+      {showWatermark && <PulpyWatermark variant="card" />}
       {/* Header gradient or image */}
       <div 
         className="h-32"
