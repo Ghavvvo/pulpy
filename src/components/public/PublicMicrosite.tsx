@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, ExternalLink, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone } from "lucide-react";
+import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
   id: string;
@@ -29,6 +30,7 @@ interface PublicProfileData {
 interface PublicMicrositeProps {
   profile: PublicProfileData;
   onDownloadVcf: () => void;
+  showWatermark?: boolean;
 }
 
 const getPlatformIcon = (platform: string) => {
@@ -43,7 +45,7 @@ const getPlatformIcon = (platform: string) => {
   return icons[platform] ?? <Globe className="w-5 h-5" />;
 };
 
-const PublicMicrosite = ({ profile, onDownloadVcf }: PublicMicrositeProps) => {
+const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: PublicMicrositeProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20">
       <section
@@ -124,8 +126,10 @@ const PublicMicrosite = ({ profile, onDownloadVcf }: PublicMicrositeProps) => {
               ))}
             </div>
           </div>
+          {showWatermark && <PulpyWatermark variant="card" />}
         </Card>
       </main>
+      {showWatermark && <PulpyWatermark variant="floating" />}
     </div>
   );
 };
