@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, ExternalLink, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone } from "lucide-react";
+import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone } from "lucide-react";
 import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
@@ -83,16 +83,10 @@ const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: Publ
 
               {profile.bio && <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl">{profile.bio}</p>}
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-                <Button size="lg" onClick={onDownloadVcf}>
+              <div className="mt-6 w-full">
+                <Button size="lg" className="w-full" onClick={onDownloadVcf}>
                   <Download className="w-4 h-4 mr-2" />
                   Guardar contacto
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <a href={`/${profile.username}`}>
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Abrir enlace
-                  </a>
                 </Button>
               </div>
 
