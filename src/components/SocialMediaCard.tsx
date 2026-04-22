@@ -46,6 +46,7 @@ const SocialMediaCard = ({
   coverType = 'color',
   coverImage,
   coverColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  showWatermark = false,
 }: SocialMediaCardProps) => {
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden bg-card shadow-xl rounded-3xl border-0">
