@@ -126,8 +126,10 @@ const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: Publ
               ))}
             </div>
           </div>
+          {showWatermark && <PulpyWatermark variant="card" />}
         </Card>
       </main>
+      {showWatermark && <PulpyWatermark variant="floating" />}
     </div>
   );
 };
