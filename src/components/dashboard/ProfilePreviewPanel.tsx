@@ -35,31 +35,44 @@ interface ProfilePreviewPanelProps {
 const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewPanelProps) => {
   return (
     <div className="space-y-4">
-      <Link
-        to={`/${username}`}
-        state={{
-          cachedProfile: {
-            username,
-            name: profile.name,
-            title: profile.title,
-            company: profile.company,
-            bio: profile.bio,
-            location: profile.location,
-            email: "",
-            phone: profile.phone,
-            avatar: profile.avatar,
-            coverType: profile.coverType,
-            coverImage: profile.coverImage,
-            coverColor: profile.coverColor,
-            cardStyle: profile.cardStyle,
-            socialLinks,
-          },
-        }}
-        className="mx-2 flex items-center gap-2 text-sm text-muted-foreground hover:underline"
-      >
-        <Eye className="w-4 h-4" />
-        Vista pública en tiempo real
-      </Link>
+      <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-wide text-primary">Vista pública</p>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Mira tu perfil tal como lo verán tus visitantes.
+            </p>
+          </div>
+        </div>
+        <Button asChild size="sm" className="mt-3 w-full gap-2 rounded-full shadow-md">
+          <Link
+            to={`/${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            state={{
+              cachedProfile: {
+                username,
+                name: profile.name,
+                title: profile.title,
+                company: profile.company,
+                bio: profile.bio,
+                location: profile.location,
+                email: "",
+                phone: profile.phone,
+                avatar: profile.avatar,
+                coverType: profile.coverType,
+                coverImage: profile.coverImage,
+                coverColor: profile.coverColor,
+                cardStyle: profile.cardStyle,
+                socialLinks,
+              },
+            }}
+          >
+            <ExternalLink className="w-4 h-4" />
+            Abrir vista pública
+          </Link>
+        </Button>
+      </div>
 
       {profile.cardStyle === "professional" ? (
         <ProfileCard
