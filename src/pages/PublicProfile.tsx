@@ -88,6 +88,7 @@ END:VCARD`;
             coverImage: profile.cover_image_url,
             coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             cardStyle: profile.card_style || 'professional',
+            isPremium: profile.is_premium === true || profile.plan === 'premium' || profile.plan === 'pro',
             socialLinks: (profile.social_links || [])
               .sort((a: any, b: any) => a.display_order - b.display_order)
               .map((link: any) => ({
