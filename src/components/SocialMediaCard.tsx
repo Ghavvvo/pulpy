@@ -24,6 +24,7 @@ interface SocialMediaCardProps {
   coverType?: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
+  showWatermark?: boolean;
 }
 
 const getPlatformIcon = (platform: string) => {
