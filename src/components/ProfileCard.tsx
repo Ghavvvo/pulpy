@@ -11,6 +11,7 @@ import {
   Phone,
   MapPin
 } from "lucide-react";
+import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
   id: string;
