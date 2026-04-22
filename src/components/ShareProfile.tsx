@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  QrCode,
   Copy,
   Link as LinkIcon,
   Share2,
@@ -14,6 +13,13 @@ import {
   Send,
   Linkedin,
   Twitter,
+  Facebook,
+  Phone,
+  Slack,
+  Hash,
+  Bookmark,
+  Image as ImageIcon,
+  QrCode,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import QRCode from "react-qr-code";
