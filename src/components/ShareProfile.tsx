@@ -136,15 +136,42 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
     }
   };
 
-  const openChannel = (channel: "whatsapp" | "email" | "sms" | "linkedin" | "twitter") => {
+  type Channel =
+    | "whatsapp"
+    | "email"
+    | "sms"
+    | "linkedin"
+    | "twitter"
+    | "telegram"
+    | "facebook"
+    | "messenger"
+    | "reddit"
+    | "pinterest"
+    | "tumblr"
+    | "skype"
+    | "slack"
+    | "line"
+    | "viber";
+
+  const openChannel = (channel: Channel) => {
     const encodedUrl = encodeURIComponent(profileUrl);
     const encodedText = encodeURIComponent("Mira mi tarjeta digital Pulpy");
-    const channels: Record<typeof channel, string> = {
+    const channels: Record<Channel, string> = {
       whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
       email: `mailto:?subject=Mi%20tarjeta%20digital&body=${encodedText}%20${encodedUrl}`,
       sms: `sms:?body=${encodedText}%20${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      messenger: `https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=291494419107518&redirect_uri=${encodedUrl}`,
+      reddit: `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedText}`,
+      pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`,
+      tumblr: `https://www.tumblr.com/share/link?url=${encodedUrl}&description=${encodedText}`,
+      skype: `https://web.skype.com/share?url=${encodedUrl}&text=${encodedText}`,
+      slack: `https://slack.com/intl/en/share?url=${encodedUrl}&text=${encodedText}`,
+      line: `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`,
+      viber: `viber://forward?text=${encodedText}%20${encodedUrl}`,
     };
 
     window.open(channels[channel], "_blank", "noopener,noreferrer");
