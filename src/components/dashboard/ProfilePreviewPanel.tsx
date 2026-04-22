@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Eye } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
 
