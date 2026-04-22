@@ -192,17 +192,6 @@ const Dashboard = () => {
                     </TabsContent>
 
                     <TabsContent value="card" className="space-y-8 pb-28">
-                        <div className="rounded-xl border bg-card p-4">
-                            <p className="text-sm font-medium text-foreground">Editor de tarjeta</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                {hasUnsavedChanges
-                                    ? "Edita con tranquilidad: guarda cuando termines desde la barra inferior"
-                                    : lastSavedAt
-                                        ? `Último guardado a las ${lastSavedAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
-                                        : "No hay cambios pendientes"}
-                            </p>
-                        </div>
-
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                             <div className="xl:col-span-2 space-y-6">
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
