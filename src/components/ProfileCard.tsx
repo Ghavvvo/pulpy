@@ -136,7 +136,6 @@ const ProfileCard = ({
           ))}
         </div>
       </div>
-      {showWatermark && <PulpyWatermark variant="card" />}
     </Card>
   );
 };
