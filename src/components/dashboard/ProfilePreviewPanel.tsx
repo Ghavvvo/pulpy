@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SocialLink {
   id: string;
