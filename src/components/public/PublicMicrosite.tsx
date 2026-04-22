@@ -58,7 +58,8 @@ const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: Publ
       />
 
       <main className="container mx-auto px-4 pb-10 -mt-14 max-w-2xl">
-        <Card className="rounded-3xl border shadow-lg overflow-hidden">
+        <Card className="relative rounded-3xl border shadow-lg overflow-hidden">
+          {showWatermark && <PulpyWatermark variant="card" />}
           <div className="p-6 sm:p-8">
             <div className="flex flex-col items-center text-center">
               <Avatar className="w-24 h-24 border-4 border-card shadow-md">
