@@ -225,17 +225,21 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
 
         <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-3">
           <p className="text-sm font-medium text-card-foreground">Canales de distribución</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             <Button variant="outline" size="sm" onClick={() => openChannel("whatsapp")}>
               <MessageCircle className="w-4 h-4 mr-2" />
               WhatsApp
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("telegram")}>
+              <Send className="w-4 h-4 mr-2" />
+              Telegram
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("email")}>
               <Mail className="w-4 h-4 mr-2" />
               Email
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("sms")}>
-              <Send className="w-4 h-4 mr-2" />
+              <Phone className="w-4 h-4 mr-2" />
               SMS
             </Button>
             <Button variant="outline" size="sm" onClick={() => openChannel("linkedin")}>
@@ -245,6 +249,46 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
             <Button variant="outline" size="sm" onClick={() => openChannel("twitter")}>
               <Twitter className="w-4 h-4 mr-2" />
               Twitter/X
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("facebook")}>
+              <Facebook className="w-4 h-4 mr-2" />
+              Facebook
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("messenger")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Messenger
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("reddit")}>
+              <Hash className="w-4 h-4 mr-2" />
+              Reddit
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("pinterest")}>
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Pinterest
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("tumblr")}>
+              <Bookmark className="w-4 h-4 mr-2" />
+              Tumblr
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("slack")}>
+              <Slack className="w-4 h-4 mr-2" />
+              Slack
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("skype")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Skype
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("line")}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              LINE
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openChannel("viber")}>
+              <Phone className="w-4 h-4 mr-2" />
+              Viber
+            </Button>
+            <Button variant="outline" size="sm" onClick={downloadPng}>
+              <QrCode className="w-4 h-4 mr-2" />
+              QR imagen
             </Button>
             <Button variant="outline" size="sm" onClick={copyToClipboard}>
               <Copy className="w-4 h-4 mr-2" />
