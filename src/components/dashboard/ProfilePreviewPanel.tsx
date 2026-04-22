@@ -91,6 +91,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
           coverType={profile.coverType}
           coverImage={profile.coverImage}
           coverColor={profile.coverColor}
+          showWatermark={showWatermark}
         />
       ) : (
         <SocialMediaCard
