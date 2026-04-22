@@ -45,7 +45,7 @@ const getPlatformIcon = (platform: string) => {
   return icons[platform] ?? <Globe className="w-5 h-5" />;
 };
 
-const PublicMicrosite = ({ profile, onDownloadVcf }: PublicMicrositeProps) => {
+const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: PublicMicrositeProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20">
       <section
