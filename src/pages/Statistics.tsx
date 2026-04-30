@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useState } from "react";
 import Header from "@/components/Header";
 import StatCard from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, MousePointer, Users, TrendingUp, Link as LinkIcon } from "lucide-react";
+import {
+  Eye,
+  MousePointer,
+  Users,
+  TrendingUp,
+  Link as LinkIcon,
+  Globe,
+  Smartphone,
+  Monitor,
+  Tablet,
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -20,49 +30,67 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfileStats, StatsRange } from "@/hooks/useProfileStats";
+
+const sourceLabels: Record<string, string> = {
+  direct: "Directo",
+  qr: "QR",
+  nfc: "NFC",
+  social: "Redes",
+  search: "Búsqueda",
+  referral: "Referido",
+};
+
+const deviceIcon = (d: string) => {
+  if (d === "mobile") return <Smartphone className="w-4 h-4" />;
+  if (d === "tablet") return <Tablet className="w-4 h-4" />;
+  return <Monitor className="w-4 h-4" />;
+};
+
+const PIE_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--chart-2, var(--primary) / 0.7))",
+  "hsl(var(--chart-3, var(--primary) / 0.5))",
+  "hsl(var(--chart-4, var(--primary) / 0.3))",
+];
+
+function timeAgo(iso: string) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return "Hace unos segundos";
+  if (min < 60) return `Hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `Hace ${h} h`;
+  const d = Math.floor(h / 24);
+  return `Hace ${d} d`;
+}
 
 const Statistics = () => {
-  const viewsData = [
-    { name: "Lun", visits: 45 },
-    { name: "Mar", visits: 52 },
-    { name: "Mié", visits: 38 },
-    { name: "Jue", visits: 65 },
-    { name: "Vie", visits: 78 },
-    { name: "Sáb", visits: 42 },
-    { name: "Dom", visits: 35 },
-  ];
+  const { user } = useAuth();
+  const [range, setRange] = useState<StatsRange>("7d");
+  const stats = useProfileStats(user?.id, range);
 
-  const linkClicks = [
-    { name: "LinkedIn", clicks: 234, color: "hsl(var(--chart-1))" },
-    { name: "Twitter", clicks: 156, color: "hsl(var(--chart-2))" },
-    { name: "Instagram", clicks: 189, color: "hsl(var(--chart-3))" },
-    { name: "Website", clicks: 98, color: "hsl(var(--chart-4))" },
-  ];
-
-  const recentVisitors = [
-    { name: "Visitante anónimo", time: "Hace 5 min", source: "QR Code" },
-    { name: "Visitante anónimo", time: "Hace 15 min", source: "Link directo" },
-    { name: "Visitante anónimo", time: "Hace 32 min", source: "NFC" },
-    { name: "Visitante anónimo", time: "Hace 1 hora", source: "QR Code" },
-    { name: "Visitante anónimo", time: "Hace 2 horas", source: "Link directo" },
-  ];
+  const conversionLabel = `${stats.totals.conversionRate}%`;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Estadísticas
-            </h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Estadísticas</h1>
             <p className="text-muted-foreground mt-1">
-              Analiza el rendimiento de tu tarjeta digital
+              Datos reales de tu tarjeta digital{stats.loading ? " · cargando…" : ""}
             </p>
           </div>
-          <Select defaultValue="7d">
+          <Select value={range} onValueChange={(v) => setRange(v as StatsRange)}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
@@ -74,72 +102,53 @@ const Statistics = () => {
           </Select>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Visitas totales"
-            value="1,247"
-            change="+12.5%"
-            changeType="positive"
-            icon={Eye}
-          />
-          <StatCard
-            title="Clics en enlaces"
-            value="677"
-            change="+8.2%"
-            changeType="positive"
-            icon={MousePointer}
-          />
+          <StatCard title="Visitas totales" value={stats.totals.views.toLocaleString()} icon={Eye} />
+          <StatCard title="Clics en enlaces" value={stats.totals.clicks.toLocaleString()} icon={MousePointer} />
           <StatCard
             title="Visitantes únicos"
-            value="892"
-            change="+5.1%"
-            changeType="positive"
+            value={stats.totals.uniqueVisitors.toLocaleString()}
             icon={Users}
           />
-          <StatCard
-            title="Tasa de conversión"
-            value="54.3%"
-            change="-2.3%"
-            changeType="negative"
-            icon={TrendingUp}
-          />
+          <StatCard title="Tasa de conversión" value={conversionLabel} icon={TrendingUp} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Views Chart */}
           <Card className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg">Visitas por día</CardTitle>
+              <CardTitle className="text-lg">Visitas y clics por día</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={viewsData}>
+                  <LineChart data={stats.daily}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <Tooltip 
+                    <XAxis dataKey="label" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
+                    <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
                       }}
                     />
+                    <Legend />
                     <Line
                       type="monotone"
                       dataKey="visits"
+                      name="Visitas"
                       stroke="hsl(var(--primary))"
                       strokeWidth={3}
                       dot={{ fill: "hsl(var(--primary))", strokeWidth: 2 }}
-                      activeDot={{ r: 6, fill: "hsl(var(--primary))" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="clicks"
+                      name="Clics"
+                      stroke="hsl(var(--muted-foreground))"
+                      strokeWidth={2}
+                      strokeDasharray="4 4"
+                      dot={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -147,75 +156,155 @@ const Statistics = () => {
             </CardContent>
           </Card>
 
-          {/* Link Clicks Chart */}
           <Card className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg">Clics por enlace</CardTitle>
+              <CardTitle className="text-lg">Top enlaces</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={linkClicks} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      type="number" 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      type="category" 
-                      dataKey="name" 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      width={80}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Bar 
-                      dataKey="clicks" 
-                      fill="hsl(var(--primary))"
-                      radius={[0, 4, 4, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                {stats.topLinks.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                    Aún no hay clics en este período.
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats.topLinks} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
+                      <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} width={90} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Bar dataKey="value" name="Clics" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Visitors */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Globe className="w-4 h-4" /> Países
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.topCountries.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {stats.topCountries.map((c) => (
+                    <li key={c.name} className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{c.name}</span>
+                      <span className="text-sm text-muted-foreground">{c.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg">Dispositivos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-56">
+                {stats.devices.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Sin datos</div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={stats.devices} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} paddingAngle={2}>
+                        {stats.devices.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg">Fuentes de tráfico</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.sources.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {stats.sources.map((s) => (
+                    <li key={s.name} className="flex items-center justify-between">
+                      <span className="text-sm font-medium capitalize">{sourceLabels[s.name] || s.name}</span>
+                      <span className="text-sm text-muted-foreground">{s.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="text-lg">Actividad reciente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentVisitors.map((visitor, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-secondary/30 rounded-xl"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-primary" />
+            {stats.recent.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Aún no hay actividad. Comparte tu enlace para empezar a ver visitas.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {stats.recent.map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center justify-between p-4 bg-secondary/30 rounded-xl"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        {a.type === "view" ? (
+                          <Eye className="w-5 h-5 text-primary" />
+                        ) : (
+                          <LinkIcon className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-card-foreground truncate">{a.label}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {timeAgo(a.createdAt)}
+                          {a.city || a.country ? ` · ${[a.city, a.country].filter(Boolean).join(", ")}` : ""}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-card-foreground">{visitor.name}</p>
-                      <p className="text-sm text-muted-foreground">{visitor.time}</p>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-full shrink-0">
+                      {deviceIcon(a.device)}
+                      <span className="text-xs text-muted-foreground capitalize">
+                        {sourceLabels[a.source] || a.source}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-full">
-                    <LinkIcon className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{visitor.source}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>
