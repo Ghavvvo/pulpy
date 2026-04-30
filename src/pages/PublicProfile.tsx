@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { trackLinkClick, trackProfileView } from "@/lib/tracking";
 
 const PublicProfile = () => {
   const { username } = useParams();
@@ -75,6 +76,7 @@ END:VCARD`;
         if (profile) {
           // Map database data to component format
           const profileData = {
+            id: profile.id,
             username: profile.username,
             name: profile.full_name || '',
             title: profile.title || '',
@@ -119,6 +121,15 @@ END:VCARD`;
 
   }, [username, location]);
 
+  // Registrar la visita una sola vez por sesión, solo en visitas reales
+  // (no cuando se abre desde el dashboard con cachedProfile, que es preview del dueño).
+  useEffect(() => {
+    const isOwnerPreview = !!location.state?.cachedProfile;
+    if (!profile?.id || !profile?.username || isOwnerPreview) return;
+    trackProfileView(profile.id, profile.username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
@@ -144,7 +155,24 @@ END:VCARD`;
     );
   }
 
-  return <PublicMicrosite profile={profile} onDownloadVcf={handleDownloadVcf} showWatermark={!profile.isPremium} />;
+  return (
+    <PublicMicrosite
+      profile={profile}
+      onDownloadVcf={handleDownloadVcf}
+      onLinkClick={(link) => {
+        if (!profile?.id || !profile?.username) return;
+        trackLinkClick({
+          profileId: profile.id,
+          username: profile.username,
+          linkId: link.id,
+          platform: link.platform,
+          label: link.label,
+          url: link.url,
+        });
+      }}
+      showWatermark={!profile.isPremium}
+    />
+  );
 };
 
 export default PublicProfile;

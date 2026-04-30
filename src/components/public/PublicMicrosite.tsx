@@ -13,6 +13,7 @@ interface SocialLink {
 }
 
 interface PublicProfileData {
+  id?: string;
   username: string;
   name: string;
   title: string;
@@ -30,6 +31,7 @@ interface PublicProfileData {
 interface PublicMicrositeProps {
   profile: PublicProfileData;
   onDownloadVcf: () => void;
+  onLinkClick?: (link: SocialLink) => void;
   showWatermark?: boolean;
 }
 
@@ -45,7 +47,7 @@ const getPlatformIcon = (platform: string) => {
   return icons[platform] ?? <Globe className="w-5 h-5" />;
 };
 
-const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: PublicMicrositeProps) => {
+const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = false }: PublicMicrositeProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20">
       <section
@@ -113,6 +115,8 @@ const PublicMicrosite = ({ profile, onDownloadVcf, showWatermark = false }: Publ
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => onLinkClick?.(link)}
+                  onAuxClick={() => onLinkClick?.(link)}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border bg-secondary/40 px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
                 >
                   {getPlatformIcon(link.platform)}
