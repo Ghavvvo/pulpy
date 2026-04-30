@@ -121,6 +121,15 @@ END:VCARD`;
 
   }, [username, location]);
 
+  // Registrar la visita una sola vez por sesión, solo en visitas reales
+  // (no cuando se abre desde el dashboard con cachedProfile, que es preview del dueño).
+  useEffect(() => {
+    const isOwnerPreview = !!location.state?.cachedProfile;
+    if (!profile?.id || !profile?.username || isOwnerPreview) return;
+    trackProfileView(profile.id, profile.username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
