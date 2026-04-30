@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { trackLinkClick, trackProfileView } from "@/lib/tracking";
 
 const PublicProfile = () => {
   const { username } = useParams();
@@ -75,6 +76,7 @@ END:VCARD`;
         if (profile) {
           // Map database data to component format
           const profileData = {
+            id: profile.id,
             username: profile.username,
             name: profile.full_name || '',
             title: profile.title || '',
@@ -144,7 +146,24 @@ END:VCARD`;
     );
   }
 
-  return <PublicMicrosite profile={profile} onDownloadVcf={handleDownloadVcf} showWatermark={!profile.isPremium} />;
+  return (
+    <PublicMicrosite
+      profile={profile}
+      onDownloadVcf={handleDownloadVcf}
+      onLinkClick={(link) => {
+        if (!profile?.id || !profile?.username) return;
+        trackLinkClick({
+          profileId: profile.id,
+          username: profile.username,
+          linkId: link.id,
+          platform: link.platform,
+          label: link.label,
+          url: link.url,
+        });
+      }}
+      showWatermark={!profile.isPremium}
+    />
+  );
 };
 
 export default PublicProfile;
