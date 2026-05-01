@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 import { LogOut, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -15,7 +16,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-lg border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to={isAuthenticated && user ? `/${user.username+ '/dashboard'}` : "/"} className="flex items-center gap-2">
           <span className="font-bold text-xl text-foreground">Pulpy</span>
@@ -49,6 +50,7 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           {isLanding ? (
             <>
               <Button variant="ghost" asChild>
