@@ -12,6 +12,7 @@ import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
+import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 
 interface SocialLink {
     id: string;
@@ -61,6 +62,15 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState("home");
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const [showOnboarding, setShowOnboarding] = useState(() => {
+        if (!user) return false;
+        return localStorage.getItem(`pulpy_onboarded_${user.id}`) !== "1";
+    });
+
+    const handleOnboardingComplete = () => {
+        if (user) localStorage.setItem(`pulpy_onboarded_${user.id}`, "1");
+        setShowOnboarding(false);
+    };
     const [lastSavedSnapshot, setLastSavedSnapshot] = useState(() => JSON.stringify({
         profile: {
             name: user?.name || "",
@@ -231,6 +241,8 @@ const Dashboard = () => {
                     </div>
                 )}
             </main>
+
+            <OnboardingWizard open={showOnboarding} onComplete={handleOnboardingComplete} />
         </div>
     );
 };
