@@ -106,7 +106,7 @@ const OnboardingWizard = ({ open, onComplete }: OnboardingWizardProps) => {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden" hideCloseButton>
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden [&>button.absolute]:hidden">
         <div className="px-6 pt-6 pb-4 border-b">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-muted-foreground">
