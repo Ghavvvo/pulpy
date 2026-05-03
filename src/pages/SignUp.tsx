@@ -82,7 +82,7 @@ const SignUp = () => {
 
       toast({
         title: "¡Cuenta creada!",
-        description: "Tu cuenta ha sido creada exitosamente",
+        description: "Te enviamos un correo para verificar tu email. Revisa tu bandeja.",
       });
 
       // Redirigir al dashboard del nuevo usuario

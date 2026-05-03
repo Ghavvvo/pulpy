@@ -163,12 +163,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signup = async (data: SignupData) => {
-    const username = data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
-    
+    const { suggestFromEmail, isUsernameAvailable } = await import("@/lib/username");
+    let username = suggestFromEmail(data.email);
+    // Ensure uniqueness with up to 5 attempts
+    for (let i = 0; i < 5; i++) {
+      const ok = await isUsernameAvailable(username);
+      if (ok) break;
+      username = `${suggestFromEmail(data.email)}${Math.floor(Math.random() * 9000 + 1000)}`.slice(0, 30);
+    }
+
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           name: data.name,
           username: username,
