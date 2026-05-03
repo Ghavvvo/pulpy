@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import ProfileEditor from "@/components/ProfileEditor";
+import UsernameEditor from "@/components/UsernameEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
 import {PremiumAlert} from "@/components/PremiumAlert";
@@ -204,6 +205,7 @@ const Dashboard = () => {
                     <TabsContent value="card" className="space-y-8 pb-28">
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                             <div className="xl:col-span-2 space-y-6">
+                                <UsernameEditor />
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
                             </div>
