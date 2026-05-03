@@ -62,7 +62,7 @@ const SocialMediaCard = ({
       />
       
       {/* Profile content */}
-      <div className="px-6 pb-8 -mt-16 flex flex-col items-center text-center">
+      <div className={`px-6 -mt-16 flex flex-col items-center text-center ${showWatermark ? "pb-20" : "pb-8"}`}>
         <Avatar className="w-28 h-28 border-4 border-card shadow-lg">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">
