@@ -76,7 +76,7 @@ const ProfileCard = ({
       />
 
       {/* Profile content */}
-      <div className="px-6 pb-6 -mt-12">
+      <div className={`px-6 -mt-12 ${showWatermark ? "pb-16" : "pb-6"}`}>
         <Avatar className="w-24 h-24 border-4 border-card shadow-lg">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
