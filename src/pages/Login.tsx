@@ -161,6 +161,18 @@ const Login = () => {
                   "Iniciar Sesión"
                 )}
               </Button>
+              {needsVerification && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleResendVerification}
+                  disabled={resending}
+                >
+                  {resending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                  Reenviar correo de verificación
+                </Button>
+              )}
             </form>
 
             <div className="relative">
