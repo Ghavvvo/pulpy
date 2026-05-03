@@ -39,7 +39,7 @@ const UsernameEditor = () => {
     }
 
     const validation = validateUsernameFormat(value);
-    if (validation.ok === false) {
+    if (validation.ok !== true) {
       setStatus({ kind: "invalid", reason: validation.reason });
       return;
     }
