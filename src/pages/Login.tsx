@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,10 +19,13 @@ const Login = () => {
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setNeedsVerification(false);
 
     try {
       const userData = await login(email, password);
@@ -31,21 +35,46 @@ const Login = () => {
         variant: "success",
       });
 
-      // Redirigir a donde venía o al dashboard del usuario
       const from = location.state?.from;
       if (from && from !== "/login" && from !== "/signup") {
         navigate(from);
       } else {
         navigate(`/${userData.username}/dashboard`);
       }
-    } catch (error) {
+    } catch (error: any) {
+      const msg: string = error?.message || "";
+      const notConfirmed = /confirm/i.test(msg) || /verif/i.test(msg);
+      if (notConfirmed) setNeedsVerification(true);
       toast({
         title: "Error al iniciar sesión",
-        description: "Email: maria@techcorp.com | Contraseña: password123",
+        description: notConfirmed
+          ? "Tu email aún no está verificado. Reenvía el correo de verificación."
+          : msg || "Credenciales inválidas",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({ title: "Falta tu email", description: "Escribe tu email primero", variant: "destructive" });
+      return;
+    }
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) throw error;
+      toast({ title: "Correo reenviado", description: `Revisa la bandeja de ${email}` });
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.message || "No se pudo reenviar", variant: "destructive" });
+    } finally {
+      setResending(false);
     }
   };
 
