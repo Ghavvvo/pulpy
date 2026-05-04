@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+import CvUploader from "@/components/CvUploader";
 
 interface SocialLink {
     id: string;
