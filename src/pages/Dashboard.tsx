@@ -60,6 +60,7 @@ const Dashboard = () => {
         coverImage: user?.coverImage,
         cardStyle: user?.cardStyle || 'professional',
         cvUrl: user?.cvUrl,
+        theme: user?.theme || { preset: DEFAULT_THEME },
     });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -93,6 +94,7 @@ const Dashboard = () => {
             coverImage: user?.coverImage,
             cardStyle: user?.cardStyle || 'professional',
             cvUrl: user?.cvUrl,
+            theme: user?.theme || { preset: DEFAULT_THEME },
         },
         socialLinks: user?.socialLinks || [],
     }));
