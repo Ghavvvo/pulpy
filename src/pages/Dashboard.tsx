@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+import CvUploader from "@/components/CvUploader";
 
 interface SocialLink {
     id: string;
@@ -35,6 +36,7 @@ interface ProfileData {
     coverImage?: string;
     coverColor?: string;
     cardStyle: 'professional' | 'social';
+    cvUrl?: string;
 }
 
 const Dashboard = () => {
@@ -54,6 +56,7 @@ const Dashboard = () => {
         coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         coverImage: user?.coverImage,
         cardStyle: user?.cardStyle || 'professional',
+        cvUrl: user?.cvUrl,
     });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -86,6 +89,7 @@ const Dashboard = () => {
             coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             coverImage: user?.coverImage,
             cardStyle: user?.cardStyle || 'professional',
+            cvUrl: user?.cvUrl,
         },
         socialLinks: user?.socialLinks || [],
     }));
@@ -106,6 +110,7 @@ const Dashboard = () => {
                 coverColor: user.coverColor,
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
+                cvUrl: user.cvUrl,
             };
 
             setProfile(nextProfile);
@@ -159,6 +164,12 @@ const Dashboard = () => {
         return persistProfile(nextProfile, socialLinks, "Los cambios de imagen se guardaron automáticamente");
     };
 
+    const handleCvChange = async (url: string | null) => {
+        const nextProfile = { ...profile, cvUrl: url || undefined };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Tu CV se guardó automáticamente");
+    };
+
     const profileUrl = `${window.location.origin}/${username}`;
 
     return (
@@ -207,6 +218,7 @@ const Dashboard = () => {
                             <div className="xl:col-span-2 space-y-6">
                                 <UsernameEditor />
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
+                                <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
                             </div>
                             <div className="xl:col-span-1">

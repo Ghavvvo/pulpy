@@ -18,6 +18,7 @@ interface User {
   coverImage?: string;
   coverColor?: string;
   cardStyle: 'professional' | 'social';
+  cvUrl?: string;
   socialLinks: SocialLink[];
   subscription: Subscription;
 }
@@ -99,6 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         coverImage: profile.cover_image_url,
         coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         cardStyle: profile.card_style || 'professional',
+        cvUrl: profile.cv_url || undefined,
         socialLinks: (socialLinks || []).map(link => ({
           id: link.id,
           platform: link.platform,
@@ -214,6 +216,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.coverImage !== undefined) profileUpdate.cover_image_url = data.coverImage;
       if (data.coverColor !== undefined) profileUpdate.cover_color = data.coverColor;
       if (data.cardStyle !== undefined) profileUpdate.card_style = data.cardStyle;
+      if (data.cvUrl !== undefined) profileUpdate.cv_url = data.cvUrl || null;
 
       const { error: profileError } = await supabase
         .from('profiles')

@@ -25,6 +25,7 @@ interface ProfileData {
   coverImage?: string;
   coverColor?: string;
   cardStyle: "professional" | "social";
+  cvUrl?: string;
 }
 
 interface ProfilePreviewPanelProps {
@@ -67,6 +68,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
                 coverImage: profile.coverImage,
                 coverColor: profile.coverColor,
                 cardStyle: profile.cardStyle,
+                cvUrl: profile.cvUrl,
                 socialLinks,
               },
             }}

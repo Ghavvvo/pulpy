@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone } from "lucide-react";
+import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone, FileText } from "lucide-react";
 import PulpyWatermark from "@/components/PulpyWatermark";
 
 interface SocialLink {
@@ -25,6 +25,7 @@ interface PublicProfileData {
   coverType: "color" | "image";
   coverImage?: string;
   coverColor?: string;
+  cvUrl?: string;
   socialLinks: SocialLink[];
 }
 
@@ -85,11 +86,19 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
 
               {profile.bio && <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl">{profile.bio}</p>}
 
-              <div className="mt-6 w-full">
+              <div className="mt-6 w-full space-y-2">
                 <Button size="lg" className="w-full" onClick={onDownloadVcf}>
                   <Download className="w-4 h-4 mr-2" />
                   Guardar contacto
                 </Button>
+                {profile.cvUrl && (
+                  <Button asChild size="lg" variant="outline" className="w-full">
+                    <a href={profile.cvUrl} target="_blank" rel="noopener noreferrer" download>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Descargar CV
+                    </a>
+                  </Button>
+                )}
               </div>
 
               <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
