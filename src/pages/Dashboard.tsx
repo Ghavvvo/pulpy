@@ -225,6 +225,11 @@ const Dashboard = () => {
                                 <UsernameEditor />
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
                                 <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} />
+                                <ThemeCustomizer
+                                    value={profile.theme || { preset: DEFAULT_THEME }}
+                                    onChange={(theme) => setProfile({ ...profile, theme })}
+                                    isPremium={isPremium}
+                                />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
                             </div>
                             <div className="xl:col-span-1">
