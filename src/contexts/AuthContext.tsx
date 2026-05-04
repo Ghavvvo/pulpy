@@ -103,6 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         cardStyle: profile.card_style || 'professional',
         cvUrl: profile.cv_url || undefined,
+        theme: profile.theme || undefined,
         socialLinks: (socialLinks || []).map(link => ({
           id: link.id,
           platform: link.platform,
