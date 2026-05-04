@@ -116,6 +116,7 @@ const Dashboard = () => {
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
                 cvUrl: user.cvUrl,
+                theme: user.theme || { preset: DEFAULT_THEME },
             };
 
             setProfile(nextProfile);
