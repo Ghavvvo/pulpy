@@ -25,6 +25,7 @@ interface PublicProfileData {
   coverType: "color" | "image";
   coverImage?: string;
   coverColor?: string;
+  cvUrl?: string;
   socialLinks: SocialLink[];
 }
 
