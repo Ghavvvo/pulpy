@@ -218,6 +218,7 @@ const Dashboard = () => {
                             <div className="xl:col-span-2 space-y-6">
                                 <UsernameEditor />
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
+                                <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
                             </div>
                             <div className="xl:col-span-1">
