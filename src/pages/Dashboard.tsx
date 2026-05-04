@@ -164,6 +164,12 @@ const Dashboard = () => {
         return persistProfile(nextProfile, socialLinks, "Los cambios de imagen se guardaron automáticamente");
     };
 
+    const handleCvChange = async (url: string | null) => {
+        const nextProfile = { ...profile, cvUrl: url || undefined };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Tu CV se guardó automáticamente");
+    };
+
     const profileUrl = `${window.location.origin}/${username}`;
 
     return (
