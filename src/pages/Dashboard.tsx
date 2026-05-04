@@ -15,6 +15,8 @@ import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 import CvUploader from "@/components/CvUploader";
+import ThemeCustomizer from "@/components/ThemeCustomizer";
+import { MicrositeTheme, DEFAULT_THEME } from "@/lib/themes";
 
 interface SocialLink {
     id: string;
@@ -37,6 +39,7 @@ interface ProfileData {
     coverColor?: string;
     cardStyle: 'professional' | 'social';
     cvUrl?: string;
+    theme?: MicrositeTheme;
 }
 
 const Dashboard = () => {
