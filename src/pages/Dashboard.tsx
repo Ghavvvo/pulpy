@@ -35,6 +35,7 @@ interface ProfileData {
     coverImage?: string;
     coverColor?: string;
     cardStyle: 'professional' | 'social';
+    cvUrl?: string;
 }
 
 const Dashboard = () => {
