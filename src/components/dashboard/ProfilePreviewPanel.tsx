@@ -72,6 +72,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
                 cardStyle: profile.cardStyle,
                 cvUrl: profile.cvUrl,
                 theme: profile.theme,
+                isPremium,
                 socialLinks,
               },
             }}
