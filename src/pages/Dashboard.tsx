@@ -110,6 +110,7 @@ const Dashboard = () => {
                 coverColor: user.coverColor,
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
+                cvUrl: user.cvUrl,
             };
 
             setProfile(nextProfile);
