@@ -89,6 +89,7 @@ const Dashboard = () => {
             coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             coverImage: user?.coverImage,
             cardStyle: user?.cardStyle || 'professional',
+            cvUrl: user?.cvUrl,
         },
         socialLinks: user?.socialLinks || [],
     }));
