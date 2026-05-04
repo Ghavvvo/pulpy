@@ -18,6 +18,7 @@ interface User {
   coverImage?: string;
   coverColor?: string;
   cardStyle: 'professional' | 'social';
+  cvUrl?: string;
   socialLinks: SocialLink[];
   subscription: Subscription;
 }
