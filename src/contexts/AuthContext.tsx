@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { Subscription, BillingCycle } from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { MicrositeTheme } from "@/lib/themes";
 
 interface User {
   id: string;
@@ -19,6 +20,7 @@ interface User {
   coverColor?: string;
   cardStyle: 'professional' | 'social';
   cvUrl?: string;
+  theme?: MicrositeTheme;
   socialLinks: SocialLink[];
   subscription: Subscription;
 }
@@ -101,6 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         cardStyle: profile.card_style || 'professional',
         cvUrl: profile.cv_url || undefined,
+        theme: profile.theme || undefined,
         socialLinks: (socialLinks || []).map(link => ({
           id: link.id,
           platform: link.platform,
@@ -217,6 +220,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.coverColor !== undefined) profileUpdate.cover_color = data.coverColor;
       if (data.cardStyle !== undefined) profileUpdate.card_style = data.cardStyle;
       if (data.cvUrl !== undefined) profileUpdate.cv_url = data.cvUrl || null;
+      if (data.theme !== undefined) profileUpdate.theme = data.theme || null;
 
       const { error: profileError } = await supabase
         .from('profiles')

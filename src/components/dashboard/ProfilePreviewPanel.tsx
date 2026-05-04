@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import ProfileCard from "@/components/ProfileCard";
 import SocialMediaCard from "@/components/SocialMediaCard";
 import { useAuth } from "@/contexts/AuthContext";
+import { MicrositeTheme } from "@/lib/themes";
 
 interface SocialLink {
   id: string;
@@ -26,6 +27,7 @@ interface ProfileData {
   coverColor?: string;
   cardStyle: "professional" | "social";
   cvUrl?: string;
+  theme?: MicrositeTheme;
 }
 
 interface ProfilePreviewPanelProps {
@@ -69,6 +71,8 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
                 coverColor: profile.coverColor,
                 cardStyle: profile.cardStyle,
                 cvUrl: profile.cvUrl,
+                theme: profile.theme,
+                isPremium,
                 socialLinks,
               },
             }}

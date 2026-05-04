@@ -15,6 +15,8 @@ import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 import CvUploader from "@/components/CvUploader";
+import ThemeCustomizer from "@/components/ThemeCustomizer";
+import { MicrositeTheme, DEFAULT_THEME } from "@/lib/themes";
 
 interface SocialLink {
     id: string;
@@ -37,6 +39,7 @@ interface ProfileData {
     coverColor?: string;
     cardStyle: 'professional' | 'social';
     cvUrl?: string;
+    theme?: MicrositeTheme;
 }
 
 const Dashboard = () => {
@@ -57,6 +60,7 @@ const Dashboard = () => {
         coverImage: user?.coverImage,
         cardStyle: user?.cardStyle || 'professional',
         cvUrl: user?.cvUrl,
+        theme: user?.theme || { preset: DEFAULT_THEME },
     });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
@@ -90,6 +94,7 @@ const Dashboard = () => {
             coverImage: user?.coverImage,
             cardStyle: user?.cardStyle || 'professional',
             cvUrl: user?.cvUrl,
+            theme: user?.theme || { preset: DEFAULT_THEME },
         },
         socialLinks: user?.socialLinks || [],
     }));
@@ -111,6 +116,7 @@ const Dashboard = () => {
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
                 cvUrl: user.cvUrl,
+                theme: user.theme || { preset: DEFAULT_THEME },
             };
 
             setProfile(nextProfile);
@@ -219,6 +225,11 @@ const Dashboard = () => {
                                 <UsernameEditor />
                                 <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
                                 <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} />
+                                <ThemeCustomizer
+                                    value={profile.theme || { preset: DEFAULT_THEME }}
+                                    onChange={(theme) => setProfile({ ...profile, theme })}
+                                    isPremium={isPremium}
+                                />
                                 <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
                             </div>
                             <div className="xl:col-span-1">
