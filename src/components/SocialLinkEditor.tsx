@@ -179,7 +179,7 @@ const SortableLink = ({
   );
 };
 
-const SocialLinkEditor = ({ links, onLinksChange }: SocialLinkEditorProps) => {
+const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLinkEditorProps) => {
   const [newLink, setNewLink] = useState<Partial<SocialLink>>({
     platform: "instagram",
     url: "",
