@@ -15,6 +15,7 @@ interface Props {
   value: MicrositeTheme;
   onChange: (next: MicrositeTheme) => void;
   isPremium: boolean;
+  embedded?: boolean;
 }
 
 const GRADIENTS = [
