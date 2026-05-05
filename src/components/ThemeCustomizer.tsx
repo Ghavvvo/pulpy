@@ -15,6 +15,7 @@ interface Props {
   value: MicrositeTheme;
   onChange: (next: MicrositeTheme) => void;
   isPremium: boolean;
+  embedded?: boolean;
 }
 
 const GRADIENTS = [
@@ -26,7 +27,7 @@ const GRADIENTS = [
   "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
 ];
 
-const ThemeCustomizer = ({ value, onChange, isPremium }: Props) => {
+const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
 
@@ -73,6 +74,10 @@ const ThemeCustomizer = ({ value, onChange, isPremium }: Props) => {
     }
   };
 
+  if (embedded) {
+    return <div className="space-y-6">{renderInner()}</div>;
+  }
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
@@ -84,7 +89,12 @@ const ThemeCustomizer = ({ value, onChange, isPremium }: Props) => {
           Elige cómo se verá tu microsite público.
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6">{renderInner()}</CardContent>
+    </Card>
+  );
+
+  function renderInner() {
+    return (<>
         {/* Theme presets */}
         <div className="space-y-3">
           <Label className="text-sm font-medium">Galería de temas</Label>
@@ -255,9 +265,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium }: Props) => {
             </TabsContent>
           </Tabs>
         </div>
-      </CardContent>
-    </Card>
-  );
+    </>);
+  }
 };
 
 export default ThemeCustomizer;

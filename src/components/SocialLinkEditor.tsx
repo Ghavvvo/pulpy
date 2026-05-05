@@ -70,6 +70,7 @@ interface SocialLink {
 interface SocialLinkEditorProps {
   links: SocialLink[];
   onLinksChange: (links: SocialLink[]) => void;
+  embedded?: boolean;
 }
 
 const platforms = [
@@ -178,7 +179,7 @@ const SortableLink = ({
   );
 };
 
-const SocialLinkEditor = ({ links, onLinksChange }: SocialLinkEditorProps) => {
+const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLinkEditorProps) => {
   const [newLink, setNewLink] = useState<Partial<SocialLink>>({
     platform: "instagram",
     url: "",
@@ -252,75 +253,66 @@ const SocialLinkEditor = ({ links, onLinksChange }: SocialLinkEditorProps) => {
     return <Globe className="w-4 h-4" />;
   };
 
+  const body = (
+    <div className="space-y-4">
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={links.map((link) => link.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-3">
+            {links.map((link) => (
+              <SortableLink
+                key={link.id}
+                link={link}
+                updateLink={updateLink}
+                removeLink={removeLink}
+                getPlatformIcon={getPlatformIcon}
+              />
+            ))}
+            {links.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6 border border-dashed rounded-xl">
+                Aún no has agregado enlaces. Empieza añadiendo tu red social favorita abajo.
+              </p>
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      <div className="pt-4 border-t border-border">
+        <Label className="text-sm font-medium mb-3 block">Agregar nuevo enlace</Label>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <Select value={newLink.platform} onValueChange={(value) => setNewLink({ ...newLink, platform: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Plataforma" />
+            </SelectTrigger>
+            <SelectContent>
+              {platforms.map((platform) => (
+                <SelectItem key={platform.value} value={platform.value}>
+                  <div className="flex items-center gap-2">
+                    <platform.icon className="w-4 h-4" />
+                    {platform.label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input placeholder="Etiqueta (ej: Mi Instagram)" value={newLink.label} onChange={(e) => setNewLink({ ...newLink, label: e.target.value })} />
+          <Input placeholder="URL" value={newLink.url} onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} />
+          <Button onClick={addLink} className="w-full">
+            <Plus className="w-4 h-4 mr-2" />
+            Agregar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (embedded) return body;
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg">Enlaces de Redes Sociales</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={links.map((link) => link.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-3">
-              {links.map((link) => (
-                <SortableLink
-                  key={link.id}
-                  link={link}
-                  updateLink={updateLink}
-                  removeLink={removeLink}
-                  getPlatformIcon={getPlatformIcon}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-
-        <div className="pt-4 border-t border-border">
-          <Label className="text-sm font-medium mb-3 block">Agregar nuevo enlace</Label>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <Select
-              value={newLink.platform}
-              onValueChange={(value) =>
-                setNewLink({ ...newLink, platform: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Plataforma" />
-              </SelectTrigger>
-              <SelectContent>
-                {platforms.map((platform) => (
-                  <SelectItem key={platform.value} value={platform.value}>
-                    <div className="flex items-center gap-2">
-                      <platform.icon className="w-4 h-4" />
-                      {platform.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              placeholder="Etiqueta (ej: Mi Instagram)"
-              value={newLink.label}
-              onChange={(e) => setNewLink({ ...newLink, label: e.target.value })}
-            />
-            <Input
-              placeholder="URL"
-              value={newLink.url}
-              onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-            />
-            <Button onClick={addLink} className="w-full">
-              <Plus className="w-4 h-4 mr-2" />
-              Agregar
-            </Button>
-          </div>
-        </div>
-      </CardContent>
+      <CardContent>{body}</CardContent>
     </Card>
   );
 };

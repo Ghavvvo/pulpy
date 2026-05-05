@@ -20,7 +20,7 @@ type Status =
   | { kind: "available" }
   | { kind: "current" };
 
-const UsernameEditor = () => {
+const UsernameEditor = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { user, updateProfile } = useAuth();
   const [value, setValue] = useState(user?.username ?? "");
   const [status, setStatus] = useState<Status>({ kind: "current" });
@@ -76,6 +76,53 @@ const UsernameEditor = () => {
     }
   };
 
+  const body = (
+    <div className="space-y-3">
+      <div className="space-y-2">
+        <Label htmlFor="username">Tu enlace público</Label>
+        <div className="relative">
+          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            id="username"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="tu-usuario"
+            className="pl-9 pr-10"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            {status.kind === "checking" && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
+            {status.kind === "available" && <Check className="w-4 h-4 text-green-600" />}
+            {status.kind === "taken" && <X className="w-4 h-4 text-destructive" />}
+            {status.kind === "invalid" && <X className="w-4 h-4 text-destructive" />}
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          pulpy.app/<span className="font-medium text-foreground">{normalized || "tu-usuario"}</span>
+        </p>
+        <p className="text-xs min-h-4">
+          {status.kind === "current" && <span className="text-muted-foreground">Este es tu nombre actual.</span>}
+          {status.kind === "checking" && <span className="text-muted-foreground">Comprobando disponibilidad…</span>}
+          {status.kind === "available" && <span className="text-green-600">¡Disponible!</span>}
+          {status.kind === "taken" && <span className="text-destructive">Este usuario ya está en uso.</span>}
+          {status.kind === "invalid" && <span className="text-destructive">{status.reason}</span>}
+        </p>
+      </div>
+
+      <Button
+        className="w-full rounded-full"
+        onClick={handleSave}
+        disabled={status.kind !== "available" || saving}
+      >
+        {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+        Guardar nombre de usuario
+      </Button>
+    </div>
+  );
+
+  if (embedded) return body;
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
@@ -84,55 +131,7 @@ const UsernameEditor = () => {
           Define tu enlace público: <span className="font-medium text-foreground">pulpy.app/{normalized || "tu-usuario"}</span>
         </p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="space-y-2">
-          <Label htmlFor="username">Usuario</Label>
-          <div className="relative">
-            <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="username"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="tu-usuario"
-              className="pl-9 pr-10"
-              autoComplete="off"
-              spellCheck={false}
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              {status.kind === "checking" && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
-              {status.kind === "available" && <Check className="w-4 h-4 text-green-600" />}
-              {status.kind === "taken" && <X className="w-4 h-4 text-destructive" />}
-              {status.kind === "invalid" && <X className="w-4 h-4 text-destructive" />}
-            </div>
-          </div>
-          <p className="text-xs min-h-4">
-            {status.kind === "current" && (
-              <span className="text-muted-foreground">Este es tu nombre actual.</span>
-            )}
-            {status.kind === "checking" && (
-              <span className="text-muted-foreground">Comprobando disponibilidad…</span>
-            )}
-            {status.kind === "available" && (
-              <span className="text-green-600">¡Disponible!</span>
-            )}
-            {status.kind === "taken" && (
-              <span className="text-destructive">Este usuario ya está en uso.</span>
-            )}
-            {status.kind === "invalid" && (
-              <span className="text-destructive">{status.reason}</span>
-            )}
-          </p>
-        </div>
-
-        <Button
-          className="w-full rounded-full"
-          onClick={handleSave}
-          disabled={status.kind !== "available" || saving}
-        >
-          {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-          Guardar nombre de usuario
-        </Button>
-      </CardContent>
+      <CardContent>{body}</CardContent>
     </Card>
   );
 };
