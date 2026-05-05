@@ -19,6 +19,38 @@ import CvUploader from "@/components/CvUploader";
 import ThemeCustomizer from "@/components/ThemeCustomizer";
 import { MicrositeTheme, DEFAULT_THEME } from "@/lib/themes";
 
+interface SectionItemProps {
+    id: string;
+    step: number;
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    children: React.ReactNode;
+}
+
+const SectionItem = ({ id, step, icon, title, subtitle, children }: SectionItemProps) => (
+    <AccordionItem
+        value={id}
+        className="border bg-card rounded-2xl shadow-sm overflow-hidden data-[state=open]:shadow-md transition-shadow"
+    >
+        <AccordionTrigger className="px-5 py-4 hover:no-underline group">
+            <div className="flex items-center gap-4 flex-1 text-left">
+                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-semibold flex-shrink-0">
+                    {step}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 font-semibold text-foreground">
+                        <span className="text-muted-foreground group-hover:text-primary transition-colors">{icon}</span>
+                        {title}
+                    </div>
+                    <p className="text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</p>
+                </div>
+            </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-5 pb-5 pt-1 space-y-6">{children}</AccordionContent>
+    </AccordionItem>
+);
+
 interface SocialLink {
     id: string;
     platform: string;
