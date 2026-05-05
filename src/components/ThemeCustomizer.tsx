@@ -265,9 +265,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
             </TabsContent>
           </Tabs>
         </div>
-      </CardContent>
-    </Card>
-  );
+    </>);
+  }
 };
 
 export default ThemeCustomizer;
