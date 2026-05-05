@@ -70,6 +70,7 @@ interface SocialLink {
 interface SocialLinkEditorProps {
   links: SocialLink[];
   onLinksChange: (links: SocialLink[]) => void;
+  embedded?: boolean;
 }
 
 const platforms = [
