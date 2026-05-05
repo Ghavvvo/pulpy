@@ -74,6 +74,10 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
     }
   };
 
+  if (embedded) {
+    return <div className="space-y-6">{renderInner()}</div>;
+  }
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
@@ -85,7 +89,12 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
           Elige cómo se verá tu microsite público.
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6">{renderInner()}</CardContent>
+    </Card>
+  );
+
+  function renderInner() {
+    return (<>
         {/* Theme presets */}
         <div className="space-y-3">
           <Label className="text-sm font-medium">Galería de temas</Label>
