@@ -9,9 +9,10 @@ import { useAuth } from "@/contexts/AuthContext";
 interface CvUploaderProps {
   cvUrl?: string;
   onCvChange: (url: string | null) => Promise<void> | void;
+  embedded?: boolean;
 }
 
-const CvUploader = ({ cvUrl, onCvChange }: CvUploaderProps) => {
+const CvUploader = ({ cvUrl, onCvChange, embedded = false }: CvUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
