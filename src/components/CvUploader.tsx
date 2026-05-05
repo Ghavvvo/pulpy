@@ -70,6 +70,41 @@ const CvUploader = ({ cvUrl, onCvChange, embedded = false }: CvUploaderProps) =>
     }
   };
 
+  const body = (
+    <div className="space-y-4">
+      <input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={handleFileChange} />
+      {cvUrl ? (
+        <div className="flex items-center gap-3 p-4 rounded-xl border bg-secondary/40">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">CV publicado</p>
+            <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+              Ver archivo <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleClick} disabled={uploading || removing}>
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleRemove} disabled={uploading || removing}>
+            {removing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+          </Button>
+        </div>
+      ) : (
+        <Button onClick={handleClick} disabled={uploading} className="w-full" variant="outline">
+          {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+          {uploading ? "Subiendo..." : "Subir CV en PDF"}
+        </Button>
+      )}
+      {embedded && (
+        <p className="text-xs text-muted-foreground">PDF, máx. 10MB. Se guarda automáticamente.</p>
+      )}
+    </div>
+  );
+
+  if (embedded) return body;
+
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
@@ -81,45 +116,7 @@ const CvUploader = ({ cvUrl, onCvChange, embedded = false }: CvUploaderProps) =>
           Súbelo y los visitantes podrán descargarlo desde tu microsite. Máx. 10MB.
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <input
-          ref={inputRef}
-          type="file"
-          accept="application/pdf"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-
-        {cvUrl ? (
-          <div className="flex items-center gap-3 p-4 rounded-xl border bg-secondary/40">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <FileText className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">CV publicado</p>
-              <a
-                href={cvUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
-              >
-                Ver archivo <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleClick} disabled={uploading || removing}>
-              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleRemove} disabled={uploading || removing}>
-              {removing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            </Button>
-          </div>
-        ) : (
-          <Button onClick={handleClick} disabled={uploading} className="w-full" variant="outline">
-            {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-            {uploading ? "Subiendo..." : "Subir CV en PDF"}
-          </Button>
-        )}
-      </CardContent>
+      <CardContent>{body}</CardContent>
     </Card>
   );
 };
