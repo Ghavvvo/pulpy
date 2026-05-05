@@ -222,16 +222,84 @@ const Dashboard = () => {
 
                     <TabsContent value="card" className="space-y-8 pb-28">
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                            <div className="xl:col-span-2 space-y-6">
-                                <UsernameEditor />
-                                <ProfileEditor profile={profile} onProfileChange={setProfile} onAutoSave={handleAutoSaveProfile} />
-                                <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} />
-                                <ThemeCustomizer
-                                    value={profile.theme || { preset: DEFAULT_THEME }}
-                                    onChange={(theme) => setProfile({ ...profile, theme })}
-                                    isPremium={isPremium}
-                                />
-                                <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} />
+                            <div className="xl:col-span-2">
+                                <Accordion type="multiple" defaultValue={["identity"]} className="space-y-3">
+                                    <SectionItem
+                                        id="identity"
+                                        step={1}
+                                        icon={<User className="w-4 h-4" />}
+                                        title="Identidad"
+                                        subtitle="Tu foto, nombre y enlace público"
+                                    >
+                                        <ProfileEditor
+                                            profile={profile}
+                                            onProfileChange={setProfile}
+                                            onAutoSave={handleAutoSaveProfile}
+                                            section="avatar"
+                                            embedded
+                                        />
+                                        <UsernameEditor embedded />
+                                    </SectionItem>
+
+                                    <SectionItem
+                                        id="info"
+                                        step={2}
+                                        icon={<IdCard className="w-4 h-4" />}
+                                        title="Información"
+                                        subtitle="Cargo, empresa, contacto y biografía"
+                                    >
+                                        <ProfileEditor
+                                            profile={profile}
+                                            onProfileChange={setProfile}
+                                            onAutoSave={handleAutoSaveProfile}
+                                            section="info"
+                                            embedded
+                                        />
+                                    </SectionItem>
+
+                                    <SectionItem
+                                        id="links"
+                                        step={3}
+                                        icon={<LinkIcon className="w-4 h-4" />}
+                                        title="Enlaces"
+                                        subtitle="Redes sociales y links a tu contenido"
+                                    >
+                                        <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} embedded />
+                                    </SectionItem>
+
+                                    <SectionItem
+                                        id="docs"
+                                        step={4}
+                                        icon={<FileText className="w-4 h-4" />}
+                                        title="Documentos"
+                                        subtitle="CV o currículum descargable en PDF"
+                                    >
+                                        <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} embedded />
+                                    </SectionItem>
+
+                                    <SectionItem
+                                        id="appearance"
+                                        step={5}
+                                        icon={<Sparkles className="w-4 h-4" />}
+                                        title="Apariencia"
+                                        subtitle="Estilo de tarjeta, portada, tema y colores"
+                                    >
+                                        <ProfileEditor
+                                            profile={profile}
+                                            onProfileChange={setProfile}
+                                            onAutoSave={handleAutoSaveProfile}
+                                            section="appearance"
+                                            embedded
+                                        />
+                                        <div className="pt-2 border-t" />
+                                        <ThemeCustomizer
+                                            value={profile.theme || { preset: DEFAULT_THEME }}
+                                            onChange={(theme) => setProfile({ ...profile, theme })}
+                                            isPremium={isPremium}
+                                            embedded
+                                        />
+                                    </SectionItem>
+                                </Accordion>
                             </div>
                             <div className="xl:col-span-1">
                                 <div className="sticky top-24">
