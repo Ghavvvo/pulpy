@@ -27,7 +27,7 @@ const GRADIENTS = [
   "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
 ];
 
-const ThemeCustomizer = ({ value, onChange, isPremium }: Props) => {
+const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
 
