@@ -20,7 +20,7 @@ type Status =
   | { kind: "available" }
   | { kind: "current" };
 
-const UsernameEditor = () => {
+const UsernameEditor = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { user, updateProfile } = useAuth();
   const [value, setValue] = useState(user?.username ?? "");
   const [status, setStatus] = useState<Status>({ kind: "current" });
