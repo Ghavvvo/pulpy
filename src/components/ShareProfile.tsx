@@ -29,7 +29,8 @@ interface ShareProfileProps {
 }
 
 const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
-  const qrWrapperRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -54,85 +55,6 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
     }
   };
 
-  const getSvgMarkup = () => {
-    const svgElement = qrWrapperRef.current?.querySelector("svg");
-    if (!svgElement) throw new Error("No se encontró el QR");
-    return new XMLSerializer().serializeToString(svgElement);
-  };
-
-  const downloadSvg = () => {
-    try {
-      const svgMarkup = getSvgMarkup();
-      const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "pulpy-qr.svg";
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast({ title: "Error", description: "No se pudo descargar SVG", variant: "destructive" });
-    }
-  };
-
-  const renderQrToCanvas = async () => {
-    const svgMarkup = getSvgMarkup();
-    const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.src = url;
-
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error("No se pudo renderizar QR"));
-    });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 1024;
-    canvas.height = 1024;
-    const context = canvas.getContext("2d");
-
-    if (!context) {
-      URL.revokeObjectURL(url);
-      throw new Error("No se pudo crear canvas");
-    }
-
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 112, 112, 800, 800);
-    URL.revokeObjectURL(url);
-    return canvas;
-  };
-
-  const downloadPng = async () => {
-    try {
-      const canvas = await renderQrToCanvas();
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "pulpy-qr.png";
-      link.click();
-    } catch {
-      toast({ title: "Error", description: "No se pudo descargar PNG", variant: "destructive" });
-    }
-  };
-
-  const downloadPdf = async () => {
-    try {
-      const canvas = await renderQrToCanvas();
-      const pngData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
-      pdf.setFontSize(18);
-      pdf.text("Código QR de tu perfil Pulpy", 40, 50);
-      pdf.addImage(pngData, "PNG", 112, 90, 380, 380);
-      pdf.setFontSize(11);
-      pdf.text(profileUrl, 40, 500, { maxWidth: 520 });
-      pdf.save("pulpy-qr.pdf");
-    } catch {
-      toast({ title: "Error", description: "No se pudo descargar PDF", variant: "destructive" });
-    }
-  };
 
   type Channel =
     | "whatsapp"
