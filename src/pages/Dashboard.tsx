@@ -228,33 +228,23 @@ const Dashboard = () => {
                     <PremiumAlert />
                 </div>
 
-            <main className="container mx-auto px-4 pt-24 pb-12">
+            <main className="container mx-auto px-4 pt-32 md:pt-24 pb-12">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            Mi Tarjeta Digital
+                            {activeTab === "home" && "Inicio"}
+                            {activeTab === "card" && "Mi Tarjeta Digital"}
+                            {activeTab === "share" && "QR & Compartir"}
                         </h1>
                         <p className="text-muted-foreground mt-1">
-                            Personaliza tu perfil y compártelo con el mundo
+                            {activeTab === "home" && "Resumen rápido y acceso a tu perfil público"}
+                            {activeTab === "card" && "Personaliza tu perfil y compártelo con el mundo"}
+                            {activeTab === "share" && "Descarga tu QR y comparte tu enlace"}
                         </p>
                     </div>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                        <TabsTrigger value="home" className="py-2.5">
-                            <Home className="w-4 h-4 mr-2" />
-                            Inicio
-                        </TabsTrigger>
-                        <TabsTrigger value="card" className="py-2.5">
-                            <Edit3 className="w-4 h-4 mr-2" />
-                            Mi Tarjeta
-                        </TabsTrigger>
-                        <TabsTrigger value="share" className="py-2.5">
-                            <Share2 className="w-4 h-4 mr-2" />
-                            QR & Compartir
-                        </TabsTrigger>
-                    </TabsList>
 
                     <TabsContent value="home" className="space-y-6">
                         <DashboardHomeTab profileUrl={profileUrl} onOpenShareCenter={() => setActiveTab("share")} />
