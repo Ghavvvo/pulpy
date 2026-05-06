@@ -21,6 +21,7 @@ interface User {
   cardStyle: 'professional' | 'social';
   cvUrl?: string;
   theme?: MicrositeTheme;
+  qrConfig?: Record<string, unknown>;
   socialLinks: SocialLink[];
   subscription: Subscription;
 }
@@ -104,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         cardStyle: profile.card_style || 'professional',
         cvUrl: profile.cv_url || undefined,
         theme: profile.theme || undefined,
+        qrConfig: profile.qr_config || undefined,
         socialLinks: (socialLinks || []).map(link => ({
           id: link.id,
           platform: link.platform,
@@ -221,6 +223,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.cardStyle !== undefined) profileUpdate.card_style = data.cardStyle;
       if (data.cvUrl !== undefined) profileUpdate.cv_url = data.cvUrl || null;
       if (data.theme !== undefined) profileUpdate.theme = data.theme || null;
+      if (data.qrConfig !== undefined) profileUpdate.qr_config = data.qrConfig || null;
 
       const { error: profileError } = await supabase
         .from('profiles')
