@@ -117,29 +117,18 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
           </Button>
         </div>
 
-        <div className="rounded-2xl bg-secondary/30 p-6 flex flex-col items-center gap-4">
-          <div ref={qrWrapperRef} className="rounded-2xl bg-card p-4 border border-border shadow-inner">
-            <QRCode value={profileUrl} size={220} className="h-52 w-52" />
-          </div>
-          <p className="text-sm text-muted-foreground">QR dinámico para compartir tu tarjeta</p>
-        </div>
+        <QrDesigner
+          profileUrl={profileUrl}
+          isPremium={isPremium}
+          userId={user?.id}
+          defaultLogo={user?.avatar}
+          onUpgrade={() => navigate("/pricing")}
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Button variant="outline" onClick={downloadPng}>
-            <Download className="w-4 h-4 mr-2" />
-            PNG
-          </Button>
-          <Button variant="outline" onClick={downloadSvg}>
-            <Download className="w-4 h-4 mr-2" />
-            SVG
-          </Button>
-          <Button variant="outline" onClick={downloadPdf}>
-            <Download className="w-4 h-4 mr-2" />
-            PDF
-          </Button>
-          <Button onClick={shareProfile}>
+        <div>
+          <Button onClick={shareProfile} className="w-full">
             <Share2 className="w-4 h-4 mr-2" />
-            Compartir
+            Compartir mi tarjeta
           </Button>
         </div>
 
