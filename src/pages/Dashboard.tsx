@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import ProfileEditor from "@/components/ProfileEditor";
 import UsernameEditor from "@/components/UsernameEditor";
 import SocialLinkEditor from "@/components/SocialLinkEditor";
 import ShareProfile from "@/components/ShareProfile";
 import {PremiumAlert} from "@/components/PremiumAlert";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Tabs, TabsContent} from "@/components/ui/tabs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Edit3, Save, Loader2, Home, Share2, User, IdCard, Link as LinkIcon, FileText, Sparkles } from "lucide-react";
+import { Save, Loader2, User, IdCard, Link as LinkIcon, FileText, Sparkles } from "lucide-react";
 import {toast} from "@/hooks/use-toast";
 import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,15 @@ const Dashboard = () => {
         user?.socialLinks || []
     );
 
-    const [activeTab, setActiveTab] = useState("home");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get("tab") || "home";
+    const setActiveTab = (tab: string) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("tab", tab);
+            return next;
+        }, { replace: true });
+    };
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
     const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -220,33 +228,23 @@ const Dashboard = () => {
                     <PremiumAlert />
                 </div>
 
-            <main className="container mx-auto px-4 pt-24 pb-12">
+            <main className="container mx-auto px-4 pt-32 md:pt-24 pb-12">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            Mi Tarjeta Digital
+                            {activeTab === "home" && "Inicio"}
+                            {activeTab === "card" && "Mi Tarjeta Digital"}
+                            {activeTab === "share" && "QR & Compartir"}
                         </h1>
                         <p className="text-muted-foreground mt-1">
-                            Personaliza tu perfil y compártelo con el mundo
+                            {activeTab === "home" && "Resumen rápido y acceso a tu perfil público"}
+                            {activeTab === "card" && "Personaliza tu perfil y compártelo con el mundo"}
+                            {activeTab === "share" && "Descarga tu QR y comparte tu enlace"}
                         </p>
                     </div>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                        <TabsTrigger value="home" className="py-2.5">
-                            <Home className="w-4 h-4 mr-2" />
-                            Inicio
-                        </TabsTrigger>
-                        <TabsTrigger value="card" className="py-2.5">
-                            <Edit3 className="w-4 h-4 mr-2" />
-                            Mi Tarjeta
-                        </TabsTrigger>
-                        <TabsTrigger value="share" className="py-2.5">
-                            <Share2 className="w-4 h-4 mr-2" />
-                            QR & Compartir
-                        </TabsTrigger>
-                    </TabsList>
 
                     <TabsContent value="home" className="space-y-6">
                         <DashboardHomeTab profileUrl={profileUrl} onOpenShareCenter={() => setActiveTab("share")} />
