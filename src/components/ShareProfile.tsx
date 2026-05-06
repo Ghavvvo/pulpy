@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,6 @@ import {
   Copy,
   Link as LinkIcon,
   Share2,
-  Download,
   Crown,
   MessageCircle,
   Mail,
@@ -19,11 +17,11 @@ import {
   Hash,
   Bookmark,
   Image as ImageIcon,
-  QrCode,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import QRCode from "react-qr-code";
-import { jsPDF } from "jspdf";
+import QrDesigner from "@/components/QrDesigner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface ShareProfileProps {
   profileUrl: string;
