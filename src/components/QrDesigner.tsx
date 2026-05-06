@@ -151,8 +151,10 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
     }
     setConfig((prev) => {
       const next = { ...prev, ...patch };
-      // persist quietly (debounced through updateProfile call)
-      updateProfile({ qrConfig: next } as never).catch(() => {});
+      // persist quietly
+      try {
+        void (updateProfile as (d: unknown) => unknown)({ qrConfig: next });
+      } catch { /* ignore */ }
       return next;
     });
   };
