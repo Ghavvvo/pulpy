@@ -100,7 +100,15 @@ const Dashboard = () => {
         user?.socialLinks || []
     );
 
-    const [activeTab, setActiveTab] = useState("home");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get("tab") || "home";
+    const setActiveTab = (tab: string) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("tab", tab);
+            return next;
+        }, { replace: true });
+    };
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
     const [showOnboarding, setShowOnboarding] = useState(() => {
