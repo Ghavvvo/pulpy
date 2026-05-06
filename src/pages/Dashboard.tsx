@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import ProfileEditor from "@/components/ProfileEditor";
 import UsernameEditor from "@/components/UsernameEditor";
