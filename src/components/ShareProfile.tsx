@@ -195,9 +195,9 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
               <Phone className="w-4 h-4 mr-2" />
               Viber
             </Button>
-            <Button variant="outline" size="sm" onClick={downloadPng}>
-              <QrCode className="w-4 h-4 mr-2" />
-              QR imagen
+            <Button variant="outline" size="sm" onClick={copyToClipboard}>
+              <LinkIcon className="w-4 h-4 mr-2" />
+              Copiar enlace
             </Button>
             <Button variant="outline" size="sm" onClick={copyToClipboard}>
               <Copy className="w-4 h-4 mr-2" />
