@@ -127,6 +127,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       };
 
+      // Fetch roles (best-effort: table may not exist yet during migration)
+      try {
+        const { data: rolesData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authUser.id);
+        setRoles(((rolesData || []) as { role: AppRole }[]).map(r => r.role));
+      } catch {
+        setRoles([]);
+      }
+
       setUser(userData);
       setIsAuthenticated(true);
       return userData;
