@@ -148,6 +148,20 @@ END:VCARD`;
     );
   }
 
+  if (profile?.__suspended) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
+        <div className="text-center max-w-md px-6">
+          <h1 className="text-3xl font-bold mb-3">Perfil no disponible</h1>
+          <p className="text-muted-foreground mb-6">
+            El perfil de @{username} ha sido suspendido temporalmente.
+          </p>
+          <Button onClick={() => navigate("/")}>Volver al inicio</Button>
+        </div>
+      </div>
+    );
+  }
+
   if (!profile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
