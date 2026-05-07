@@ -6,9 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import Index from "./pages/Index";
 import PublicProfile from "./pages/PublicProfile";
 import Dashboard from "./pages/Dashboard";
+import Admin from "./pages/Admin";
 import Statistics from "./pages/Statistics";
 import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+
 
             {/* Rutas dinámicas de usuario */}
             <Route path="/:username" element={<PublicProfile />} />

@@ -73,6 +73,11 @@ END:VCARD`;
 
         if (error) throw error;
 
+        if (profile?.is_suspended) {
+          setProfile({ __suspended: true, username });
+          return;
+        }
+
         if (profile) {
           // Map database data to component format
           const profileData = {
@@ -138,6 +143,20 @@ END:VCARD`;
         <div className="animate-pulse">
           <div className="h-8 w-48 bg-muted rounded mb-4"></div>
           <div className="h-4 w-64 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (profile?.__suspended) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
+        <div className="text-center max-w-md px-6">
+          <h1 className="text-3xl font-bold mb-3">Perfil no disponible</h1>
+          <p className="text-muted-foreground mb-6">
+            El perfil de @{username} ha sido suspendido temporalmente.
+          </p>
+          <Button onClick={() => navigate("/")}>Volver al inicio</Button>
         </div>
       </div>
     );

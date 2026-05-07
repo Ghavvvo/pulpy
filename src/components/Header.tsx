@@ -8,6 +8,7 @@ import {
   Edit3,
   Share2,
   BarChart3,
+  Shield,
   ExternalLink,
   User as UserIcon,
 } from "lucide-react";
@@ -27,7 +28,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, isAuthenticated, isPremium, logout } = useAuth();
+  const { user, isAuthenticated, isPremium, isAdmin, logout } = useAuth();
   const isLanding = location.pathname === "/";
 
   const handleLogout = () => {
@@ -153,6 +154,17 @@ const Header = () => {
                         Mejorar a Premium
                       </Link>
                     </DropdownMenuItem>
+                  )}
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">
+                          <Shield className="h-4 w-4 mr-2" />
+                          Panel de administración
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">

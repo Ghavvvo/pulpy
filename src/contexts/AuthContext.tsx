@@ -33,10 +33,14 @@ interface SocialLink {
   label: string;
 }
 
+export type AppRole = "admin" | "user";
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isPremium: boolean;
+  isAdmin: boolean;
+  roles: AppRole[];
   login: (email: string, password: string) => Promise<User>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
@@ -55,6 +59,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch user profile data from Supabase
@@ -122,6 +127,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       };
 
+      // Fetch roles (best-effort: table may not exist yet during migration)
+      try {
+        const { data: rolesData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authUser.id);
+        setRoles(((rolesData || []) as { role: AppRole }[]).map(r => r.role));
+      } catch {
+        setRoles([]);
+      }
+
       setUser(userData);
       setIsAuthenticated(true);
       return userData;
@@ -149,6 +165,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        setRoles([]);
       }
       setLoading(false);
     });
@@ -298,13 +315,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const isPremium = user?.subscription?.plan === 'premium' && user?.subscription?.status === 'active';
+  const isAdmin = roles.includes('admin');
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isPremium, login, signup, logout, updateProfile, requestUpgrade }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isPremium, isAdmin, roles, login, signup, logout, updateProfile, requestUpgrade }}>
       {children}
     </AuthContext.Provider>
   );
