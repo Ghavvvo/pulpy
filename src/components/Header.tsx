@@ -8,6 +8,7 @@ import {
   Edit3,
   Share2,
   BarChart3,
+  Shield,
   ExternalLink,
   User as UserIcon,
 } from "lucide-react";
