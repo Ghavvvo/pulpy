@@ -28,7 +28,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, isAuthenticated, isPremium, logout } = useAuth();
+  const { user, isAuthenticated, isPremium, isAdmin, logout } = useAuth();
   const isLanding = location.pathname === "/";
 
   const handleLogout = () => {
