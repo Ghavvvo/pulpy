@@ -33,10 +33,14 @@ interface SocialLink {
   label: string;
 }
 
+export type AppRole = "admin" | "user";
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isPremium: boolean;
+  isAdmin: boolean;
+  roles: AppRole[];
   login: (email: string, password: string) => Promise<User>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
