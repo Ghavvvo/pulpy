@@ -314,13 +314,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const isPremium = user?.subscription?.plan === 'premium' && user?.subscription?.status === 'active';
+  const isAdmin = roles.includes('admin');
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isPremium, login, signup, logout, updateProfile, requestUpgrade }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isPremium, isAdmin, roles, login, signup, logout, updateProfile, requestUpgrade }}>
       {children}
     </AuthContext.Provider>
   );
