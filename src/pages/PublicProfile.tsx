@@ -73,6 +73,11 @@ END:VCARD`;
 
         if (error) throw error;
 
+        if (profile?.is_suspended) {
+          setProfile({ __suspended: true, username });
+          return;
+        }
+
         if (profile) {
           // Map database data to component format
           const profileData = {
