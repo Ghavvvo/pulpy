@@ -165,6 +165,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        setRoles([]);
       }
       setLoading(false);
     });
