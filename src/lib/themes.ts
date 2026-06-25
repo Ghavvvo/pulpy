@@ -143,4 +143,6 @@ export interface MicrositeTheme {
   fontFamily?: string; // id, premium
   bgType?: "theme" | "color" | "gradient" | "image";
   bgValue?: string;
+  cardColor?: string; // hex, premium - color de la tarjeta
+  textColor?: string; // hex, premium - color de la fuente/texto
 }
