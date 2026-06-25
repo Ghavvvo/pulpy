@@ -102,6 +102,9 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
               socialLinks,
               theme: profile.theme,
               isPremium: true,
+            }}
+            onDownloadVcf={() => {}}
+            showWatermark={showWatermark}
           />
         </div>
       </div>
