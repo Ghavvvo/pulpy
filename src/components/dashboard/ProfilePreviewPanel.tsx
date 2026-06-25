@@ -101,10 +101,7 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
               cvUrl: profile.cvUrl,
               socialLinks,
               theme: profile.theme,
-              isPremium,
-            }}
-            onDownloadVcf={() => {}}
-            showWatermark={showWatermark}
+              isPremium: true,
           />
         </div>
       </div>
