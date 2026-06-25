@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProfileCard from "@/components/ProfileCard";
-import SocialMediaCard from "@/components/SocialMediaCard";
+import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { useAuth } from "@/contexts/AuthContext";
 import { MicrositeTheme } from "@/lib/themes";
 
@@ -39,6 +38,7 @@ interface ProfilePreviewPanelProps {
 const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewPanelProps) => {
   const { isPremium } = useAuth();
   const showWatermark = !isPremium;
+
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 shadow-sm">
@@ -83,34 +83,31 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
         </Button>
       </div>
 
-      {profile.cardStyle === "professional" ? (
-        <ProfileCard
-          name={profile.name}
-          title={profile.title}
-          company={profile.company}
-          avatar={profile.avatar}
-          bio={profile.bio}
-          location={profile.location}
-          email={profile.email}
-          phone={profile.phone}
-          socialLinks={socialLinks}
-          coverType={profile.coverType}
-          coverImage={profile.coverImage}
-          coverColor={profile.coverColor}
-          showWatermark={showWatermark}
-        />
-      ) : (
-        <SocialMediaCard
-          name={profile.name}
-          avatar={profile.avatar}
-          bio={profile.bio}
-          socialLinks={socialLinks}
-          coverType={profile.coverType}
-          coverImage={profile.coverImage}
-          coverColor={profile.coverColor}
-          showWatermark={showWatermark}
-        />
-      )}
+      <div className="overflow-hidden rounded-2xl border shadow-sm">
+        <div className="origin-top">
+          <PublicMicrosite
+            profile={{
+              username: username || "tu-usuario",
+              name: profile.name,
+              title: profile.title,
+              company: profile.company,
+              bio: profile.bio,
+              location: profile.location,
+              phone: profile.phone,
+              avatar: profile.avatar,
+              coverType: profile.coverType,
+              coverImage: profile.coverImage,
+              coverColor: profile.coverColor,
+              cvUrl: profile.cvUrl,
+              socialLinks,
+              theme: profile.theme,
+              isPremium,
+            }}
+            onDownloadVcf={() => {}}
+            showWatermark={showWatermark}
+          />
+        </div>
+      </div>
     </div>
   );
 };
