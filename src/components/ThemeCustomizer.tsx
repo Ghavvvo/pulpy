@@ -175,9 +175,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
                 key={f.id}
                 type="button"
                 onClick={() => handleFont(f.id)}
-                disabled={!isPremium}
                 className={cn(
-                  "rounded-lg border-2 px-3 py-2 text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed",
+                  "rounded-lg border-2 px-3 py-2 text-sm transition-all",
                   (value.fontFamily || "default") === f.id
                     ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/40"
@@ -188,6 +187,9 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               </button>
             ))}
           </div>
+          {!isPremium && (
+            <p className="text-[11px] text-muted-foreground">Previsualiza ahora. Se aplicará en tu microsite público al activar Premium.</p>
+          )}
         </div>
 
         {/* Background */}
