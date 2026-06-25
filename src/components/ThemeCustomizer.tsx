@@ -136,23 +136,24 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               type="color"
               value={value.accentColor || "#7c3aed"}
               onChange={(e) => handleAccent(e.target.value)}
-              disabled={!isPremium}
-              className="h-10 w-16 p-1 cursor-pointer disabled:cursor-not-allowed"
+              className="h-10 w-16 p-1 cursor-pointer"
             />
             <Input
               type="text"
               placeholder="#7c3aed"
               value={value.accentColor || ""}
               onChange={(e) => handleAccent(e.target.value)}
-              disabled={!isPremium}
               className="flex-1"
             />
-            {value.accentColor && isPremium && (
+            {value.accentColor && (
               <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, accentColor: undefined })}>
                 Quitar
               </Button>
             )}
           </div>
+          {!isPremium && (
+            <p className="text-[11px] text-muted-foreground">Previsualiza ahora. Se aplicará en tu microsite público al activar Premium.</p>
+          )}
         </div>
 
         {/* Typography (premium) */}
