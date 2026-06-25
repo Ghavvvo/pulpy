@@ -36,12 +36,10 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
     onChange({ ...value, bgType, bgValue });
 
   const handleAccent = (hex: string) => {
-    if (!isPremium) return;
     onChange({ ...value, accentColor: hex });
   };
 
   const handleFont = (id: string) => {
-    if (!isPremium) return;
     onChange({ ...value, fontFamily: id });
   };
 
