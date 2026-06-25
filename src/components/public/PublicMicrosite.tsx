@@ -62,6 +62,19 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
       const hsl = hexToHslVar(theme.accentColor);
       if (hsl) style["--ms-accent"] = hsl;
     }
+    // Premium card color override
+    if (profile.isPremium && theme?.cardColor) {
+      const hsl = hexToHslVar(theme.cardColor);
+      if (hsl) style["--ms-card"] = hsl;
+    }
+    // Premium text color override
+    if (profile.isPremium && theme?.textColor) {
+      const hsl = hexToHslVar(theme.textColor);
+      if (hsl) {
+        style["--ms-fg"] = hsl;
+        style["--ms-card-fg"] = hsl;
+      }
+    }
     // Premium font override
     if (profile.isPremium && theme?.fontFamily) {
       const f = FONT_OPTIONS.find((x) => x.id === theme.fontFamily);
