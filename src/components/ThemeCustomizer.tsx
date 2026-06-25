@@ -93,105 +93,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
 
   function renderInner() {
     return (<>
-        {/* Theme presets */}
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Galería de temas</Label>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {THEME_PRESETS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setPreset(t.id)}
-                className={cn(
-                  "group relative rounded-xl border-2 p-2 text-left transition-all hover:shadow-md",
-                  value.preset === t.id ? "border-primary ring-2 ring-primary/30" : "border-border"
-                )}
-              >
-                <div
-                  className="h-16 w-full rounded-lg mb-2 border"
-                  style={{ background: t.background }}
-                />
-                <p className="text-xs font-semibold">{t.name}</p>
-                <p className="text-[10px] text-muted-foreground line-clamp-1">{t.description}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Accent color (premium) */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <Palette className="w-4 h-4" />
-              Color de acento
-            </Label>
-            {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <Input
-              type="color"
-              value={value.accentColor || "#7c3aed"}
-              onChange={(e) => handleAccent(e.target.value)}
-              className="h-10 w-16 p-1 cursor-pointer"
-            />
-            <Input
-              type="text"
-              placeholder="#7c3aed"
-              value={value.accentColor || ""}
-              onChange={(e) => handleAccent(e.target.value)}
-              className="flex-1"
-            />
-            {value.accentColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, accentColor: undefined })}>
-                Quitar
-              </Button>
-            )}
-          </div>
-          {!isPremium && (
-            <p className="text-[11px] text-muted-foreground">Previsualiza ahora. Se aplicará en tu microsite público al activar Premium.</p>
-          )}
-        </div>
-
-        {/* Typography (premium) */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <Type className="w-4 h-4" />
-              Tipografía
-            </Label>
-            {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
-              </span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {FONT_OPTIONS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => handleFont(f.id)}
-                className={cn(
-                  "rounded-lg border-2 px-3 py-2 text-sm transition-all",
-                  (value.fontFamily || "default") === f.id
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/40"
-                )}
-                style={f.stack ? { fontFamily: f.stack } : undefined}
-              >
-                {f.name}
-              </button>
-            ))}
-          </div>
-          {!isPremium && (
-            <p className="text-[11px] text-muted-foreground">Previsualiza ahora. Se aplicará en tu microsite público al activar Premium.</p>
-          )}
-        </div>
-
         {/* Background */}
         <div className="space-y-3">
           <Label className="text-sm font-medium flex items-center gap-2">
@@ -265,6 +166,180 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               </label>
             </TabsContent>
           </Tabs>
+        </div>
+
+        {/* Accent color */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Palette className="w-4 h-4" />
+              Color de acento
+            </Label>
+            {!isPremium && (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3" /> Premium
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Input
+              type="color"
+              value={value.accentColor || "#7c3aed"}
+              onChange={(e) => handleAccent(e.target.value)}
+              className="h-10 w-16 p-1 cursor-pointer"
+            />
+            <Input
+              type="text"
+              placeholder="#7c3aed"
+              value={value.accentColor || ""}
+              onChange={(e) => handleAccent(e.target.value)}
+              className="flex-1"
+            />
+            {value.accentColor && (
+              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, accentColor: undefined })}>
+                Quitar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Card color */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Palette className="w-4 h-4" />
+              Color de la tarjeta
+            </Label>
+            {!isPremium && (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3" /> Premium
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Input
+              type="color"
+              value={value.cardColor || "#ffffff"}
+              onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
+              className="h-10 w-16 p-1 cursor-pointer"
+            />
+            <Input
+              type="text"
+              placeholder="#ffffff"
+              value={value.cardColor || ""}
+              onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
+              className="flex-1"
+            />
+            {value.cardColor && (
+              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, cardColor: undefined })}>
+                Quitar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Text color */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Type className="w-4 h-4" />
+              Color de la fuente
+            </Label>
+            {!isPremium && (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3" /> Premium
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Input
+              type="color"
+              value={value.textColor || "#111111"}
+              onChange={(e) => onChange({ ...value, textColor: e.target.value })}
+              className="h-10 w-16 p-1 cursor-pointer"
+            />
+            <Input
+              type="text"
+              placeholder="#111111"
+              value={value.textColor || ""}
+              onChange={(e) => onChange({ ...value, textColor: e.target.value })}
+              className="flex-1"
+            />
+            {value.textColor && (
+              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, textColor: undefined })}>
+                Quitar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Typography */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Type className="w-4 h-4" />
+              Tipografía
+            </Label>
+            {!isPremium && (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3" /> Premium
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {FONT_OPTIONS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => handleFont(f.id)}
+                className={cn(
+                  "rounded-lg border-2 px-3 py-2 text-sm transition-all",
+                  (value.fontFamily || "default") === f.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40"
+                )}
+                style={f.stack ? { fontFamily: f.stack } : undefined}
+              >
+                {f.name}
+              </button>
+            ))}
+          </div>
+          {!isPremium && (
+            <p className="text-[11px] text-muted-foreground">Previsualiza ahora. Se aplicará en tu microsite público al activar Premium.</p>
+          )}
+        </div>
+
+        {/* Theme presets (at the end - presets of all configurations) */}
+        <div className="space-y-3 pt-4 border-t">
+          <div>
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Galería de temas
+            </Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              Presets que combinan fondo, colores y tipografía. Elige uno como punto de partida y personaliza arriba.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {THEME_PRESETS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setPreset(t.id)}
+                className={cn(
+                  "group relative rounded-xl border-2 p-2 text-left transition-all hover:shadow-md",
+                  value.preset === t.id ? "border-primary ring-2 ring-primary/30" : "border-border"
+                )}
+              >
+                <div
+                  className="h-16 w-full rounded-lg mb-2 border"
+                  style={{ background: t.background }}
+                />
+                <p className="text-xs font-semibold">{t.name}</p>
+                <p className="text-[10px] text-muted-foreground line-clamp-1">{t.description}</p>
+              </button>
+            ))}
+          </div>
         </div>
     </>);
   }
