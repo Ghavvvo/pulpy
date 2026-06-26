@@ -84,13 +84,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (linksError) throw linksError;
 
       // Fetch subscription
-      const { data: subscription, error: subError } = await supabase
+      let { data: subscription, error: subError } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', authUser.id)
         .single();
 
       if (subError) throw subError;
+
+      // Auto-expirar suscripciones activas vencidas
+      if (
+        subscription?.status === 'active' &&
+        subscription?.end_date &&
+        new Date(subscription.end_date).getTime() < Date.now()
+      ) {
+        const { data: updated } = await supabase
+          .from('subscriptions')
+          .update({
+            status: 'none',
+            plan: 'free',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', subscription.id)
+          .select()
+          .single();
+        if (updated) subscription = updated;
+      }
+
 
       // Map database data to User interface
       const userData: User = {
@@ -314,7 +334,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const isPremium = user?.subscription?.plan === 'premium' && user?.subscription?.status === 'active';
+  const isPremium =
+    user?.subscription?.plan === 'premium' &&
+    user?.subscription?.status === 'active' &&
+    (!user?.subscription?.endDate || new Date(user.subscription.endDate).getTime() > Date.now());
   const isAdmin = roles.includes('admin');
 
   if (loading) {
