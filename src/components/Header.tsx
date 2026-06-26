@@ -4,7 +4,6 @@ import ThemeToggle from "@/components/ThemeToggle";
 import {
   LogOut,
   Crown,
-  Home,
   Edit3,
   Share2,
   BarChart3,
@@ -49,8 +48,7 @@ const Header = () => {
 
   const navItems = user
     ? [
-        { id: "home", label: "Inicio", icon: Home, to: `/${user.username}/dashboard?tab=home`, active: onDashboard && currentTab === "home" },
-        { id: "card", label: "Mi Tarjeta", icon: Edit3, to: `/${user.username}/dashboard?tab=card`, active: onDashboard && currentTab === "card" },
+        { id: "card", label: "Mi Tarjeta", icon: Edit3, to: `/${user.username}/dashboard?tab=card`, active: onDashboard && (currentTab === "card" || currentTab === "home") },
         { id: "share", label: "QR & Compartir", icon: Share2, to: `/${user.username}/dashboard?tab=share`, active: onDashboard && currentTab === "share" },
         { id: "stats", label: "Estadísticas", icon: BarChart3, to: `/${user.username}/statistics`, active: onStatistics },
       ]
