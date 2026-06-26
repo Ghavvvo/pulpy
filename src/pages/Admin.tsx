@@ -13,8 +13,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Users, Crown, Shield, ShieldOff, Ban, CheckCircle2, ExternalLink,
-  Trash2, Eye, BarChart3,
+  Trash2, Eye, BarChart3, AlertTriangle, Calendar, Clock, Plus,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -61,13 +64,38 @@ const Admin = () => {
       supabase.from("profile_views").select("*", { count: "exact", head: true }),
       supabase.from("link_clicks").select("*", { count: "exact", head: true }),
     ]);
+    let subsData = (s as SubRow[]) || [];
+
+    // Auto-expiración: marcar como 'none/free' las activas cuyo end_date ya pasó
+    const now = Date.now();
+    const expired = subsData.filter(
+      x => x.status === "active" && x.end_date && new Date(x.end_date).getTime() < now,
+    );
+    if (expired.length > 0) {
+      await Promise.all(
+        expired.map(x =>
+          supabase.from("subscriptions").update({
+            status: "none",
+            plan: "free",
+            updated_at: new Date().toISOString(),
+          }).eq("id", x.id),
+        ),
+      );
+      subsData = subsData.map(x =>
+        expired.find(e => e.id === x.id)
+          ? { ...x, status: "none", plan: "free" }
+          : x,
+      );
+    }
+
     setProfiles((p as ProfileRow[]) || []);
-    setSubs((s as SubRow[]) || []);
+    setSubs(subsData);
     setRoles((r as RoleRow[]) || []);
     setViews(vc || 0);
     setClicks(cc || 0);
     setLoading(false);
   };
+
 
   useEffect(() => { refresh(); }, []);
 
@@ -91,11 +119,22 @@ const Admin = () => {
     );
   }, [profiles, search]);
 
-  // KPIs
+  // KPIs y alertas
   const total = profiles.length;
-  const premium = subs.filter(s => s.plan === "premium" && s.status === "active").length;
+  const activeSubs = subs.filter(s => s.plan === "premium" && s.status === "active");
+  const premium = activeSubs.length;
   const newWeek = profiles.filter(p => Date.now() - new Date(p.created_at).getTime() < 7 * 86400000).length;
   const pendingSubs = subs.filter(s => s.status === "pending");
+
+  const daysLeft = (end?: string | null) => {
+    if (!end) return null;
+    return Math.ceil((new Date(end).getTime() - Date.now()) / 86400000);
+  };
+  const expiringSoon = activeSubs.filter(s => {
+    const d = daysLeft(s.end_date);
+    return d !== null && d >= 0 && d <= 7;
+  });
+
 
   // Actions
   const toggleAdmin = async (userId: string) => {
@@ -131,22 +170,63 @@ const Admin = () => {
     refresh();
   };
 
-  const setSubStatus = async (
+  const activateSub = async (
     sub: SubRow,
-    status: "active" | "none",
-    plan: "premium" | "free",
+    days: number,
+    cycle: "monthly" | "yearly" | "custom",
   ) => {
-    const start = status === "active" ? new Date().toISOString() : null;
-    const end = status === "active"
-      ? new Date(Date.now() + (sub.billing_cycle === "yearly" ? 365 : 30) * 86400000).toISOString()
-      : null;
+    const start = new Date().toISOString();
+    const end = new Date(Date.now() + days * 86400000).toISOString();
     const { error } = await supabase.from("subscriptions").update({
-      status, plan, start_date: start, end_date: end, updated_at: new Date().toISOString(),
+      status: "active",
+      plan: "premium",
+      billing_cycle: cycle,
+      start_date: start,
+      end_date: end,
+      updated_at: new Date().toISOString(),
     }).eq("id", sub.id);
     if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
-    toast({ title: "Suscripción actualizada" });
+    toast({ title: `Suscripción activada por ${days} días` });
     refresh();
   };
+
+  const extendSub = async (sub: SubRow, days: number) => {
+    const base = sub.end_date && new Date(sub.end_date).getTime() > Date.now()
+      ? new Date(sub.end_date).getTime()
+      : Date.now();
+    const end = new Date(base + days * 86400000).toISOString();
+    const { error } = await supabase.from("subscriptions").update({
+      status: "active",
+      plan: "premium",
+      end_date: end,
+      updated_at: new Date().toISOString(),
+    }).eq("id", sub.id);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: `Extendida ${days} días` });
+    refresh();
+  };
+
+  const deactivateSub = async (sub: SubRow) => {
+    if (!confirm("¿Desactivar esta suscripción ahora?")) return;
+    const { error } = await supabase.from("subscriptions").update({
+      status: "none",
+      plan: "free",
+      end_date: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq("id", sub.id);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: "Suscripción desactivada" });
+    refresh();
+  };
+
+  const customExtend = async (sub: SubRow) => {
+    const raw = prompt("¿Cuántos días añadir? (puede ser negativo para recortar)", "30");
+    if (!raw) return;
+    const days = parseInt(raw, 10);
+    if (Number.isNaN(days) || days === 0) return;
+    extendSub(sub, days);
+  };
+
 
   const initials = (name?: string | null, fallback = "U") =>
     (name || fallback).split(" ").map(s => s[0]).join("").slice(0, 2).toUpperCase();
@@ -174,12 +254,40 @@ const Admin = () => {
           </TabsList>
 
           {/* Overview */}
-          <TabsContent value="overview" className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard icon={<Users className="w-5 h-5" />} label="Usuarios totales" value={total} />
-            <KpiCard icon={<Crown className="w-5 h-5 text-amber-500" />} label="Premium activos" value={premium} />
-            <KpiCard icon={<Users className="w-5 h-5" />} label="Nuevos (7 días)" value={newWeek} />
-            <KpiCard icon={<BarChart3 className="w-5 h-5" />} label="Visitas / clicks" value={`${views} / ${clicks}`} />
+          <TabsContent value="overview" className="mt-6 space-y-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <KpiCard icon={<Users className="w-5 h-5" />} label="Usuarios totales" value={total} />
+              <KpiCard icon={<Crown className="w-5 h-5 text-amber-500" />} label="Premium activos" value={premium} />
+              <KpiCard icon={<AlertTriangle className="w-5 h-5 text-orange-500" />} label="Vencen ≤ 7 días" value={expiringSoon.length} />
+              <KpiCard icon={<BarChart3 className="w-5 h-5" />} label="Visitas / clicks" value={`${views} / ${clicks}`} />
+            </div>
+            {expiringSoon.length > 0 && (
+              <Card className="p-4 rounded-2xl border-orange-300 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-900">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="font-medium text-orange-900 dark:text-orange-200">
+                      {expiringSoon.length} suscripción(es) próximas a vencer
+                    </div>
+                    <ul className="text-sm text-orange-800 dark:text-orange-300 mt-1 space-y-0.5">
+                      {expiringSoon.slice(0, 5).map(s => {
+                        const p = profiles.find(x => x.id === s.user_id);
+                        return (
+                          <li key={s.id}>
+                            @{p?.username || s.user_id.slice(0, 8)} — vence en {daysLeft(s.end_date)} día(s)
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <Button size="sm" variant="link" className="px-0 mt-1" onClick={() => setSearchParams({ tab: "subs" })}>
+                      Ver todas →
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
           </TabsContent>
+
 
           {/* Users */}
           <TabsContent value="users" className="mt-6 space-y-4">
@@ -264,15 +372,22 @@ const Admin = () => {
           </TabsContent>
 
           {/* Subscriptions */}
-          <TabsContent value="subs" className="mt-6">
+          <TabsContent value="subs" className="mt-6 space-y-4">
+            {expiringSoon.length > 0 && (
+              <Card className="p-3 rounded-xl border-orange-300 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-900 flex items-center gap-2 text-sm text-orange-900 dark:text-orange-200">
+                <AlertTriangle className="w-4 h-4" />
+                {expiringSoon.length} suscripción(es) vencen en los próximos 7 días.
+              </Card>
+            )}
             <Card className="rounded-2xl overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Usuario</TableHead>
-                    <TableHead>Plan</TableHead>
+                    <TableHead>Plan / Ciclo</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Ciclo</TableHead>
+                    <TableHead>Período cubierto</TableHead>
+                    <TableHead>Restan</TableHead>
                     <TableHead>Referencia</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
@@ -280,41 +395,87 @@ const Admin = () => {
                 <TableBody>
                   {[...pendingSubs, ...subs.filter(s => s.status !== "pending")].map(s => {
                     const p = profiles.find(x => x.id === s.user_id);
+                    const d = daysLeft(s.end_date);
+                    const isActive = s.status === "active";
+                    const warn = isActive && d !== null && d >= 0 && d <= 7;
                     return (
                       <TableRow key={s.id}>
                         <TableCell>
                           <div className="font-medium">{p?.full_name || "—"}</div>
                           <div className="text-xs text-muted-foreground">@{p?.username}</div>
                         </TableCell>
-                        <TableCell>{s.plan}</TableCell>
+                        <TableCell className="text-sm">
+                          <div className="capitalize">{s.plan}</div>
+                          <div className="text-xs text-muted-foreground capitalize">{s.billing_cycle || "—"}</div>
+                        </TableCell>
                         <TableCell>
                           {s.status === "pending" && <Badge variant="secondary">Pendiente</Badge>}
                           {s.status === "active" && <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Activa</Badge>}
-                          {s.status === "none" && <Badge variant="outline">—</Badge>}
+                          {s.status === "none" && <Badge variant="outline">Inactiva</Badge>}
                         </TableCell>
-                        <TableCell className="text-sm">{s.billing_cycle || "—"}</TableCell>
-                        <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[160px]">{s.payment_reference || "—"}</TableCell>
-                        <TableCell className="text-right space-x-1">
-                          {s.status !== "active" && (
-                            <Button size="sm" onClick={() => setSubStatus(s, "active", "premium")}>Aprobar</Button>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {s.start_date ? (
+                            <div className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(s.start_date).toLocaleDateString()}</div>
+                          ) : <span>—</span>}
+                          {s.end_date && (
+                            <div className="flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3" />{new Date(s.end_date).toLocaleDateString()}</div>
                           )}
-                          {s.status === "active" && (
-                            <Button size="sm" variant="outline" onClick={() => setSubStatus(s, "none", "free")}>Cancelar</Button>
-                          )}
-                          {s.status === "pending" && (
-                            <Button size="sm" variant="ghost" onClick={() => setSubStatus(s, "none", "free")}>Rechazar</Button>
-                          )}
+                        </TableCell>
+                        <TableCell>
+                          {isActive && d !== null ? (
+                            <Badge
+                              variant={warn ? "destructive" : "outline"}
+                              className={warn ? "" : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"}
+                            >
+                              {d} día{d === 1 ? "" : "s"}
+                            </Badge>
+                          ) : <span className="text-muted-foreground text-xs">—</span>}
+                        </TableCell>
+                        <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[140px]">{s.payment_reference || "—"}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="outline">Gestionar</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              <DropdownMenuLabel>Activar / renovar</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => activateSub(s, 30, "monthly")}>
+                                <Plus className="w-4 h-4 mr-2" /> Activar 30 días (mensual)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => activateSub(s, 365, "yearly")}>
+                                <Plus className="w-4 h-4 mr-2" /> Activar 365 días (anual)
+                              </DropdownMenuItem>
+                              {isActive && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuLabel>Extender vigencia</DropdownMenuLabel>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 7)}>+ 7 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 30)}>+ 30 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 365)}>+ 365 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => customExtend(s)}>Personalizado…</DropdownMenuItem>
+                                </>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => deactivateSub(s)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Ban className="w-4 h-4 mr-2" /> Desactivar ahora
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     );
                   })}
                   {subs.length === 0 && (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Sin suscripciones</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Sin suscripciones</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
             </Card>
           </TabsContent>
+
 
           {/* Moderation */}
           <TabsContent value="moderation" className="mt-6">
