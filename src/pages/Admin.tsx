@@ -119,11 +119,22 @@ const Admin = () => {
     );
   }, [profiles, search]);
 
-  // KPIs
+  // KPIs y alertas
   const total = profiles.length;
-  const premium = subs.filter(s => s.plan === "premium" && s.status === "active").length;
+  const activeSubs = subs.filter(s => s.plan === "premium" && s.status === "active");
+  const premium = activeSubs.length;
   const newWeek = profiles.filter(p => Date.now() - new Date(p.created_at).getTime() < 7 * 86400000).length;
   const pendingSubs = subs.filter(s => s.status === "pending");
+
+  const daysLeft = (end?: string | null) => {
+    if (!end) return null;
+    return Math.ceil((new Date(end).getTime() - Date.now()) / 86400000);
+  };
+  const expiringSoon = activeSubs.filter(s => {
+    const d = daysLeft(s.end_date);
+    return d !== null && d >= 0 && d <= 7;
+  });
+
 
   // Actions
   const toggleAdmin = async (userId: string) => {
