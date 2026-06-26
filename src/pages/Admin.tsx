@@ -170,22 +170,63 @@ const Admin = () => {
     refresh();
   };
 
-  const setSubStatus = async (
+  const activateSub = async (
     sub: SubRow,
-    status: "active" | "none",
-    plan: "premium" | "free",
+    days: number,
+    cycle: "monthly" | "yearly" | "custom",
   ) => {
-    const start = status === "active" ? new Date().toISOString() : null;
-    const end = status === "active"
-      ? new Date(Date.now() + (sub.billing_cycle === "yearly" ? 365 : 30) * 86400000).toISOString()
-      : null;
+    const start = new Date().toISOString();
+    const end = new Date(Date.now() + days * 86400000).toISOString();
     const { error } = await supabase.from("subscriptions").update({
-      status, plan, start_date: start, end_date: end, updated_at: new Date().toISOString(),
+      status: "active",
+      plan: "premium",
+      billing_cycle: cycle,
+      start_date: start,
+      end_date: end,
+      updated_at: new Date().toISOString(),
     }).eq("id", sub.id);
     if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
-    toast({ title: "Suscripción actualizada" });
+    toast({ title: `Suscripción activada por ${days} días` });
     refresh();
   };
+
+  const extendSub = async (sub: SubRow, days: number) => {
+    const base = sub.end_date && new Date(sub.end_date).getTime() > Date.now()
+      ? new Date(sub.end_date).getTime()
+      : Date.now();
+    const end = new Date(base + days * 86400000).toISOString();
+    const { error } = await supabase.from("subscriptions").update({
+      status: "active",
+      plan: "premium",
+      end_date: end,
+      updated_at: new Date().toISOString(),
+    }).eq("id", sub.id);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: `Extendida ${days} días` });
+    refresh();
+  };
+
+  const deactivateSub = async (sub: SubRow) => {
+    if (!confirm("¿Desactivar esta suscripción ahora?")) return;
+    const { error } = await supabase.from("subscriptions").update({
+      status: "none",
+      plan: "free",
+      end_date: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq("id", sub.id);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: "Suscripción desactivada" });
+    refresh();
+  };
+
+  const customExtend = async (sub: SubRow) => {
+    const raw = prompt("¿Cuántos días añadir? (puede ser negativo para recortar)", "30");
+    if (!raw) return;
+    const days = parseInt(raw, 10);
+    if (Number.isNaN(days) || days === 0) return;
+    extendSub(sub, days);
+  };
+
 
   const initials = (name?: string | null, fallback = "U") =>
     (name || fallback).split(" ").map(s => s[0]).join("").slice(0, 2).toUpperCase();
