@@ -254,12 +254,40 @@ const Admin = () => {
           </TabsList>
 
           {/* Overview */}
-          <TabsContent value="overview" className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard icon={<Users className="w-5 h-5" />} label="Usuarios totales" value={total} />
-            <KpiCard icon={<Crown className="w-5 h-5 text-amber-500" />} label="Premium activos" value={premium} />
-            <KpiCard icon={<Users className="w-5 h-5" />} label="Nuevos (7 días)" value={newWeek} />
-            <KpiCard icon={<BarChart3 className="w-5 h-5" />} label="Visitas / clicks" value={`${views} / ${clicks}`} />
+          <TabsContent value="overview" className="mt-6 space-y-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <KpiCard icon={<Users className="w-5 h-5" />} label="Usuarios totales" value={total} />
+              <KpiCard icon={<Crown className="w-5 h-5 text-amber-500" />} label="Premium activos" value={premium} />
+              <KpiCard icon={<AlertTriangle className="w-5 h-5 text-orange-500" />} label="Vencen ≤ 7 días" value={expiringSoon.length} />
+              <KpiCard icon={<BarChart3 className="w-5 h-5" />} label="Visitas / clicks" value={`${views} / ${clicks}`} />
+            </div>
+            {expiringSoon.length > 0 && (
+              <Card className="p-4 rounded-2xl border-orange-300 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-900">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="font-medium text-orange-900 dark:text-orange-200">
+                      {expiringSoon.length} suscripción(es) próximas a vencer
+                    </div>
+                    <ul className="text-sm text-orange-800 dark:text-orange-300 mt-1 space-y-0.5">
+                      {expiringSoon.slice(0, 5).map(s => {
+                        const p = profiles.find(x => x.id === s.user_id);
+                        return (
+                          <li key={s.id}>
+                            @{p?.username || s.user_id.slice(0, 8)} — vence en {daysLeft(s.end_date)} día(s)
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <Button size="sm" variant="link" className="px-0 mt-1" onClick={() => setSearchParams({ tab: "subs" })}>
+                      Ver todas →
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
           </TabsContent>
+
 
           {/* Users */}
           <TabsContent value="users" className="mt-6 space-y-4">
