@@ -372,15 +372,22 @@ const Admin = () => {
           </TabsContent>
 
           {/* Subscriptions */}
-          <TabsContent value="subs" className="mt-6">
+          <TabsContent value="subs" className="mt-6 space-y-4">
+            {expiringSoon.length > 0 && (
+              <Card className="p-3 rounded-xl border-orange-300 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-900 flex items-center gap-2 text-sm text-orange-900 dark:text-orange-200">
+                <AlertTriangle className="w-4 h-4" />
+                {expiringSoon.length} suscripción(es) vencen en los próximos 7 días.
+              </Card>
+            )}
             <Card className="rounded-2xl overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Usuario</TableHead>
-                    <TableHead>Plan</TableHead>
+                    <TableHead>Plan / Ciclo</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Ciclo</TableHead>
+                    <TableHead>Período cubierto</TableHead>
+                    <TableHead>Restan</TableHead>
                     <TableHead>Referencia</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
@@ -388,41 +395,87 @@ const Admin = () => {
                 <TableBody>
                   {[...pendingSubs, ...subs.filter(s => s.status !== "pending")].map(s => {
                     const p = profiles.find(x => x.id === s.user_id);
+                    const d = daysLeft(s.end_date);
+                    const isActive = s.status === "active";
+                    const warn = isActive && d !== null && d >= 0 && d <= 7;
                     return (
                       <TableRow key={s.id}>
                         <TableCell>
                           <div className="font-medium">{p?.full_name || "—"}</div>
                           <div className="text-xs text-muted-foreground">@{p?.username}</div>
                         </TableCell>
-                        <TableCell>{s.plan}</TableCell>
+                        <TableCell className="text-sm">
+                          <div className="capitalize">{s.plan}</div>
+                          <div className="text-xs text-muted-foreground capitalize">{s.billing_cycle || "—"}</div>
+                        </TableCell>
                         <TableCell>
                           {s.status === "pending" && <Badge variant="secondary">Pendiente</Badge>}
                           {s.status === "active" && <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Activa</Badge>}
-                          {s.status === "none" && <Badge variant="outline">—</Badge>}
+                          {s.status === "none" && <Badge variant="outline">Inactiva</Badge>}
                         </TableCell>
-                        <TableCell className="text-sm">{s.billing_cycle || "—"}</TableCell>
-                        <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[160px]">{s.payment_reference || "—"}</TableCell>
-                        <TableCell className="text-right space-x-1">
-                          {s.status !== "active" && (
-                            <Button size="sm" onClick={() => setSubStatus(s, "active", "premium")}>Aprobar</Button>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {s.start_date ? (
+                            <div className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(s.start_date).toLocaleDateString()}</div>
+                          ) : <span>—</span>}
+                          {s.end_date && (
+                            <div className="flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3" />{new Date(s.end_date).toLocaleDateString()}</div>
                           )}
-                          {s.status === "active" && (
-                            <Button size="sm" variant="outline" onClick={() => setSubStatus(s, "none", "free")}>Cancelar</Button>
-                          )}
-                          {s.status === "pending" && (
-                            <Button size="sm" variant="ghost" onClick={() => setSubStatus(s, "none", "free")}>Rechazar</Button>
-                          )}
+                        </TableCell>
+                        <TableCell>
+                          {isActive && d !== null ? (
+                            <Badge
+                              variant={warn ? "destructive" : "outline"}
+                              className={warn ? "" : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"}
+                            >
+                              {d} día{d === 1 ? "" : "s"}
+                            </Badge>
+                          ) : <span className="text-muted-foreground text-xs">—</span>}
+                        </TableCell>
+                        <TableCell className="text-xs font-mono text-muted-foreground truncate max-w-[140px]">{s.payment_reference || "—"}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="outline">Gestionar</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              <DropdownMenuLabel>Activar / renovar</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => activateSub(s, 30, "monthly")}>
+                                <Plus className="w-4 h-4 mr-2" /> Activar 30 días (mensual)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => activateSub(s, 365, "yearly")}>
+                                <Plus className="w-4 h-4 mr-2" /> Activar 365 días (anual)
+                              </DropdownMenuItem>
+                              {isActive && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuLabel>Extender vigencia</DropdownMenuLabel>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 7)}>+ 7 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 30)}>+ 30 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => extendSub(s, 365)}>+ 365 días</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => customExtend(s)}>Personalizado…</DropdownMenuItem>
+                                </>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => deactivateSub(s)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Ban className="w-4 h-4 mr-2" /> Desactivar ahora
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     );
                   })}
                   {subs.length === 0 && (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Sin suscripciones</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Sin suscripciones</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
             </Card>
           </TabsContent>
+
 
           {/* Moderation */}
           <TabsContent value="moderation" className="mt-6">
