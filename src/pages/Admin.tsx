@@ -13,8 +13,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Users, Crown, Shield, ShieldOff, Ban, CheckCircle2, ExternalLink,
-  Trash2, Eye, BarChart3,
+  Trash2, Eye, BarChart3, AlertTriangle, Calendar, Clock, Plus,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -61,13 +64,38 @@ const Admin = () => {
       supabase.from("profile_views").select("*", { count: "exact", head: true }),
       supabase.from("link_clicks").select("*", { count: "exact", head: true }),
     ]);
+    let subsData = (s as SubRow[]) || [];
+
+    // Auto-expiración: marcar como 'none/free' las activas cuyo end_date ya pasó
+    const now = Date.now();
+    const expired = subsData.filter(
+      x => x.status === "active" && x.end_date && new Date(x.end_date).getTime() < now,
+    );
+    if (expired.length > 0) {
+      await Promise.all(
+        expired.map(x =>
+          supabase.from("subscriptions").update({
+            status: "none",
+            plan: "free",
+            updated_at: new Date().toISOString(),
+          }).eq("id", x.id),
+        ),
+      );
+      subsData = subsData.map(x =>
+        expired.find(e => e.id === x.id)
+          ? { ...x, status: "none", plan: "free" }
+          : x,
+      );
+    }
+
     setProfiles((p as ProfileRow[]) || []);
-    setSubs((s as SubRow[]) || []);
+    setSubs(subsData);
     setRoles((r as RoleRow[]) || []);
     setViews(vc || 0);
     setClicks(cc || 0);
     setLoading(false);
   };
+
 
   useEffect(() => { refresh(); }, []);
 
