@@ -12,7 +12,7 @@ import { Save, Loader2, User, IdCard, Link as LinkIcon, FileText, Sparkles } fro
 import {toast} from "@/hooks/use-toast";
 import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import DashboardHomeTab from "@/components/dashboard/DashboardHomeTab";
+
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 import CvUploader from "@/components/CvUploader";
@@ -101,7 +101,9 @@ const Dashboard = () => {
     );
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const activeTab = searchParams.get("tab") || "home";
+    const rawTab = searchParams.get("tab") || "card";
+    // 'home' fue unificado dentro de 'share'
+    const activeTab = rawTab === "home" ? "share" : rawTab;
     const setActiveTab = (tab: string) => {
         setSearchParams((prev) => {
             const next = new URLSearchParams(prev);
@@ -232,23 +234,18 @@ const Dashboard = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            {activeTab === "home" && "Inicio"}
                             {activeTab === "card" && "Mi Tarjeta Digital"}
                             {activeTab === "share" && "QR & Compartir"}
                         </h1>
                         <p className="text-muted-foreground mt-1">
-                            {activeTab === "home" && "Resumen rápido y acceso a tu perfil público"}
                             {activeTab === "card" && "Personaliza tu perfil y compártelo con el mundo"}
-                            {activeTab === "share" && "Descarga tu QR y comparte tu enlace"}
+                            {activeTab === "share" && "Tu QR, tu enlace y todos los canales de difusión"}
                         </p>
                     </div>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
-                    <TabsContent value="home" className="space-y-6">
-                        <DashboardHomeTab profileUrl={profileUrl} onOpenShareCenter={() => setActiveTab("share")} />
-                    </TabsContent>
 
                     <TabsContent value="card" className="space-y-8 pb-28">
                         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
