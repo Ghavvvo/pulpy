@@ -31,7 +31,16 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
 
-  const setPreset = (preset: ThemePreset) => onChange({ ...value, preset });
+  const setPreset = (preset: ThemePreset) =>
+    onChange({
+      preset,
+      bgType: "theme",
+      bgValue: undefined,
+      accentColor: undefined,
+      cardColor: undefined,
+      textColor: undefined,
+      fontFamily: undefined,
+    });
   const setBg = (bgType: MicrositeTheme["bgType"], bgValue?: string) =>
     onChange({ ...value, bgType, bgValue });
 
