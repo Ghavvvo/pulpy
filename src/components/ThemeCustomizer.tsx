@@ -234,11 +234,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
               className="flex-1"
             />
-            {value.cardColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, cardColor: undefined })}>
-                Quitar
-              </Button>
-            )}
           </div>
         </div>
 
