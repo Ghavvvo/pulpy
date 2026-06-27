@@ -257,25 +257,99 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
     }
   };
 
+  const downscaleImage = (file: File, max = 512): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+      // SVGs: keep as-is (vector)
+      if (file.type === "image/svg+xml") return resolve(file);
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          return reject(new Error("canvas"));
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(url);
+            blob ? resolve(blob) : reject(new Error("blob"));
+          },
+          "image/png",
+          0.92
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("load"));
+      };
+      img.src = url;
+    });
+
+  const removeOldLogo = async () => {
+    const current = config.logo;
+    if (!current || !current.includes("/user-content/")) return;
+    const path = current.split("/user-content/")[1]?.split("?")[0];
+    if (path && path.startsWith(`${userId}/qr-logo-`)) {
+      try {
+        await supabase.storage.from("user-content").remove([path]);
+      } catch {
+        /* best effort */
+      }
+    }
+  };
+
   const handleLogoUpload = async (file: File) => {
     if (!isPremium) {
       onUpgrade?.();
       return;
     }
-    if (!userId) return;
+    if (!userId) {
+      toast({ title: "Inicia sesión", description: "Debes estar autenticado para subir un logo", variant: "destructive" });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Formato no válido", description: "Solo se admiten imágenes (PNG, JPG, SVG, WebP)", variant: "destructive" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "Archivo muy grande", description: "El logo debe pesar menos de 2 MB", variant: "destructive" });
+      return;
+    }
     setUploadingLogo(true);
     try {
-      const ext = file.name.split(".").pop() || "png";
+      const processed = await downscaleImage(file);
+      const ext = file.type === "image/svg+xml" ? "svg" : "png";
+      const contentType = file.type === "image/svg+xml" ? "image/svg+xml" : "image/png";
       const path = `${userId}/qr-logo-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      const { error } = await supabase.storage
+        .from("user-content")
+        .upload(path, processed, { upsert: true, cacheControl: "3600", contentType });
       if (error) throw error;
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-      updateConfig({ logo: data.publicUrl });
-    } catch {
-      toast({ title: "Error", description: "No se pudo subir el logo", variant: "destructive" });
+      const { data } = supabase.storage.from("user-content").getPublicUrl(path);
+      const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
+      await removeOldLogo();
+      updateConfig({ logo: publicUrl });
+      toast({ title: "Logo añadido", description: "Se aplicó al QR" });
+    } catch (err) {
+      console.error("QR logo upload error", err);
+      const message = err instanceof Error ? err.message : "No se pudo subir el logo";
+      toast({ title: "Error al subir", description: message, variant: "destructive" });
     } finally {
       setUploadingLogo(false);
     }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!isPremium) return;
+    await removeOldLogo();
+    updateConfig({ logo: undefined });
   };
 
   const PremiumLock = () =>
