@@ -31,7 +31,16 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
 
-  const setPreset = (preset: ThemePreset) => onChange({ ...value, preset });
+  const setPreset = (preset: ThemePreset) =>
+    onChange({
+      preset,
+      bgType: "theme",
+      bgValue: undefined,
+      accentColor: undefined,
+      cardColor: undefined,
+      textColor: undefined,
+      fontFamily: undefined,
+    });
   const setBg = (bgType: MicrositeTheme["bgType"], bgValue?: string) =>
     onChange({ ...value, bgType, bgValue });
 
@@ -195,11 +204,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               onChange={(e) => handleAccent(e.target.value)}
               className="flex-1"
             />
-            {value.accentColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, accentColor: undefined })}>
-                Quitar
-              </Button>
-            )}
           </div>
         </div>
 
@@ -230,11 +234,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
               className="flex-1"
             />
-            {value.cardColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, cardColor: undefined })}>
-                Quitar
-              </Button>
-            )}
           </div>
         </div>
 
@@ -265,11 +264,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               onChange={(e) => onChange({ ...value, textColor: e.target.value })}
               className="flex-1"
             />
-            {value.textColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, textColor: undefined })}>
-                Quitar
-              </Button>
-            )}
           </div>
         </div>
 
