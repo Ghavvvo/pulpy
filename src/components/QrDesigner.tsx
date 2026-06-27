@@ -497,7 +497,7 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                   <img src={effectiveConfig.logo} alt="logo" className="w-full h-full object-contain" />
                   <button
                     type="button"
-                    onClick={() => updateConfig({ logo: undefined })}
+                    onClick={handleRemoveLogo}
                     className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
                     aria-label="Quitar logo"
                   >
