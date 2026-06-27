@@ -204,11 +204,6 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               onChange={(e) => handleAccent(e.target.value)}
               className="flex-1"
             />
-            {value.accentColor && (
-              <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, accentColor: undefined })}>
-                Quitar
-              </Button>
-            )}
           </div>
         </div>
 
