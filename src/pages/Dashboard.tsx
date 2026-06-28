@@ -97,7 +97,12 @@ const Dashboard = () => {
         coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         coverImage: user?.coverImage,
         cardStyle: user?.cardStyle || 'professional',
+        industry: user?.industry,
+        website: user?.website,
+        businessHours: user?.businessHours,
         cvUrl: user?.cvUrl,
+        documentType: user?.documentType,
+        documentLabel: user?.documentLabel,
         theme: user?.theme || { preset: DEFAULT_THEME },
     });
 
