@@ -5,7 +5,6 @@ import {
   Copy,
   Link as LinkIcon,
   Share2,
-  Crown,
   MessageCircle,
   Mail,
   Send,
@@ -21,7 +20,6 @@ import {
 import { toast } from "@/hooks/use-toast";
 import QrDesigner from "@/components/QrDesigner";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 interface ShareProfileProps {
   profileUrl: string;
@@ -30,7 +28,6 @@ interface ShareProfileProps {
 
 const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -119,10 +116,8 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
 
         <QrDesigner
           profileUrl={profileUrl}
-          isPremium={isPremium}
           userId={user?.id}
           defaultLogo={user?.avatar}
-          onUpgrade={() => navigate("/pricing")}
         />
 
         <div>
@@ -203,35 +198,6 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
               <Copy className="w-4 h-4 mr-2" />
               Copiar
             </Button>
-          </div>
-        </div>
-
-        <div className="p-4 bg-secondary/40 rounded-xl border border-border space-y-3">
-          <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-primary" />
-            <p className="font-medium text-sm">Funciones Premium</p>
-          </div>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>
-              Personalizar QR (colores, logo central, forma de patrón y ojos) {isPremium ? "activado" : "disponible en Premium"}.
-            </p>
-            <p>
-              Enlace corto personalizado tipo <span className="font-medium text-foreground">custom.link/tunombre</span> {isPremium ? "activado" : "disponible en Premium"}.
-            </p>
-          </div>
-        </div>
-
-        <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">📡</span>
-            </div>
-            <div>
-              <p className="font-medium text-sm text-card-foreground">Tarjeta NFC</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Programa tu tarjeta NFC con este enlace y comparte tu perfil con un solo toque.
-              </p>
-            </div>
           </div>
         </div>
       </CardContent>

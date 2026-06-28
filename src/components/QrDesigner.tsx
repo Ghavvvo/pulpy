@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QRCodeStyling, {
   type DotType,
   type CornerSquareType,
@@ -15,19 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Crown, Download, Image as ImageIcon, X, Lock } from "lucide-react";
+import { Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
 
 interface QrDesignerProps {
   profileUrl: string;
-  isPremium: boolean;
   userId?: string;
   defaultLogo?: string;
-  onUpgrade?: () => void;
 }
 
 interface QrConfig {
@@ -83,25 +80,17 @@ const FRAME_OPTIONS = [
   { value: "custom", label: "Personalizado" },
 ] as const;
 
-const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: QrDesignerProps) => {
+const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const qrInstanceRef = useRef<QRCodeStyling | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, updateProfile } = useAuth();
 
   const [config, setConfig] = useState<QrConfig>(() => {
     const saved = (user as { qrConfig?: Partial<QrConfig> } | null)?.qrConfig;
     return { ...DEFAULT_CONFIG, ...(saved || {}), logo: saved?.logo ?? defaultLogo };
   });
-  const [uploadingLogo, setUploadingLogo] = useState(false);
 
-  const effectiveConfig = useMemo<QrConfig>(() => {
-    if (isPremium) return config;
-    return {
-      ...DEFAULT_CONFIG,
-      // Free users get plain QR with current URL only
-    };
-  }, [config, isPremium]);
+  const effectiveConfig = config;
 
   const qrSize = 260;
 
@@ -145,10 +134,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
   }, [profileUrl, effectiveConfig]);
 
   const updateConfig = (patch: Partial<QrConfig>) => {
-    if (!isPremium) {
-      onUpgrade?.();
-      return;
-    }
     setConfig((prev) => {
       const next = { ...prev, ...patch };
       // persist quietly
@@ -257,109 +242,7 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
     }
   };
 
-  const downscaleImage = (file: File, max = 512): Promise<Blob> =>
-    new Promise((resolve, reject) => {
-      // SVGs: keep as-is (vector)
-      if (file.type === "image/svg+xml") return resolve(file);
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          URL.revokeObjectURL(url);
-          return reject(new Error("canvas"));
-        }
-        ctx.drawImage(img, 0, 0, w, h);
-        canvas.toBlob(
-          (blob) => {
-            URL.revokeObjectURL(url);
-            blob ? resolve(blob) : reject(new Error("blob"));
-          },
-          "image/png",
-          0.92
-        );
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("load"));
-      };
-      img.src = url;
-    });
 
-  const removeOldLogo = async () => {
-    const current = config.logo;
-    if (!current || !current.includes("/user-content/")) return;
-    const path = current.split("/user-content/")[1]?.split("?")[0];
-    if (path && path.startsWith(`${userId}/qr-logo-`)) {
-      try {
-        await supabase.storage.from("user-content").remove([path]);
-      } catch {
-        /* best effort */
-      }
-    }
-  };
-
-  const handleLogoUpload = async (file: File) => {
-    if (!isPremium) {
-      onUpgrade?.();
-      return;
-    }
-    if (!userId) {
-      toast({ title: "Inicia sesión", description: "Debes estar autenticado para subir un logo", variant: "destructive" });
-      return;
-    }
-    if (!file.type.startsWith("image/")) {
-      toast({ title: "Formato no válido", description: "Solo se admiten imágenes (PNG, JPG, SVG, WebP)", variant: "destructive" });
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast({ title: "Archivo muy grande", description: "El logo debe pesar menos de 2 MB", variant: "destructive" });
-      return;
-    }
-    setUploadingLogo(true);
-    try {
-      const processed = await downscaleImage(file);
-      const ext = file.type === "image/svg+xml" ? "svg" : "png";
-      const contentType = file.type === "image/svg+xml" ? "image/svg+xml" : "image/png";
-      const path = `${userId}/qr-logo-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("user-content")
-        .upload(path, processed, { upsert: true, cacheControl: "3600", contentType });
-      if (error) throw error;
-      const { data } = supabase.storage.from("user-content").getPublicUrl(path);
-      const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
-      await removeOldLogo();
-      updateConfig({ logo: publicUrl });
-      toast({ title: "Logo añadido", description: "Se aplicó al QR" });
-    } catch (err) {
-      console.error("QR logo upload error", err);
-      const message = err instanceof Error ? err.message : "No se pudo subir el logo";
-      toast({ title: "Error al subir", description: message, variant: "destructive" });
-    } finally {
-      setUploadingLogo(false);
-    }
-  };
-
-  const handleRemoveLogo = async () => {
-    if (!isPremium) return;
-    await removeOldLogo();
-    updateConfig({ logo: undefined });
-  };
-
-  const PremiumLock = () =>
-    !isPremium ? (
-      <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-xl">
-        <Button size="sm" onClick={onUpgrade} className="rounded-full">
-          <Crown className="w-3.5 h-3.5 mr-1.5" /> Desbloquear con Premium
-        </Button>
-      </div>
-    ) : null;
 
   return (
     <div className="space-y-5">
@@ -396,24 +279,11 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
       </div>
 
       {/* Customization */}
-      <div className="relative rounded-2xl border border-border bg-card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-500" />
-            <h3 className="text-sm font-semibold">Personalización Premium</h3>
-          </div>
-          {!isPremium && (
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Lock className="w-3 h-3" /> Bloqueado
-            </span>
-          )}
-        </div>
-
+      <div className="rounded-2xl border border-border bg-card p-4">
         <Tabs defaultValue="style" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="style">Estilo</TabsTrigger>
             <TabsTrigger value="colors">Colores</TabsTrigger>
-            <TabsTrigger value="logo">Logo</TabsTrigger>
             <TabsTrigger value="frame">Marco</TabsTrigger>
           </TabsList>
 
@@ -424,7 +294,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 <Select
                   value={config.dotsType}
                   onValueChange={(v) => updateConfig({ dotsType: v as DotType })}
-                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -439,7 +308,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 <Select
                   value={config.cornersSquareType}
                   onValueChange={(v) => updateConfig({ cornersSquareType: v as CornerSquareType })}
-                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -454,7 +322,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 <Select
                   value={config.cornersDotType}
                   onValueChange={(v) => updateConfig({ cornersDotType: v as CornerDotType })}
-                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -473,66 +340,17 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 label="Puntos"
                 value={config.dotsColor}
                 onChange={(v) => updateConfig({ dotsColor: v })}
-                disabled={!isPremium}
               />
               <ColorField
                 label="Fondo"
                 value={config.bgColor}
                 onChange={(v) => updateConfig({ bgColor: v })}
-                disabled={!isPremium}
               />
               <ColorField
                 label="Esquinas"
                 value={config.cornersColor}
                 onChange={(v) => updateConfig({ cornersColor: v })}
-                disabled={!isPremium}
               />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="logo" className="space-y-3 pt-4">
-            <div className="flex items-center gap-3">
-              {effectiveConfig.logo ? (
-                <div className="relative w-16 h-16 rounded-lg border border-border overflow-hidden bg-muted">
-                  <img src={effectiveConfig.logo} alt="logo" className="w-full h-full object-contain" />
-                  <button
-                    type="button"
-                    onClick={handleRemoveLogo}
-                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
-                    aria-label="Quitar logo"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ) : (
-                <div className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center text-muted-foreground">
-                  <ImageIcon className="w-5 h-5" />
-                </div>
-              )}
-              <div className="flex-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!isPremium || uploadingLogo}
-                >
-                  {uploadingLogo ? "Subiendo..." : "Subir logo"}
-                </Button>
-                <p className="text-xs text-muted-foreground mt-1">
-                  PNG/SVG cuadrado. Se centra en el QR.
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleLogoUpload(f);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
             </div>
           </TabsContent>
 
@@ -543,7 +361,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 <Select
                   value={config.frame}
                   onValueChange={(v) => updateConfig({ frame: v as QrConfig["frame"] })}
-                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -557,7 +374,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                 label="Color del marco"
                 value={config.frameColor}
                 onChange={(v) => updateConfig({ frameColor: v })}
-                disabled={!isPremium}
               />
               {config.frame === "custom" && (
                 <div className="sm:col-span-2">
@@ -566,7 +382,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
                     className="mt-1"
                     value={config.frameText}
                     onChange={(e) => updateConfig({ frameText: e.target.value.slice(0, 24) })}
-                    disabled={!isPremium}
                     placeholder="Ej: Sígueme en Instagram"
                   />
                 </div>
@@ -574,8 +389,6 @@ const QrDesigner = ({ profileUrl, isPremium, userId, defaultLogo, onUpgrade }: Q
             </div>
           </TabsContent>
         </Tabs>
-
-        <PremiumLock />
       </div>
     </div>
   );
