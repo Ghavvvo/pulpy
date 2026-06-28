@@ -24,8 +24,13 @@ interface ProfileData {
   coverType: "color" | "image";
   coverImage?: string;
   coverColor?: string;
-  cardStyle: "professional" | "social";
+  cardStyle: "professional" | "social" | "company";
+  industry?: string;
+  website?: string;
+  businessHours?: string;
   cvUrl?: string;
+  documentType?: "cv" | "catalog" | "menu" | "portfolio";
+  documentLabel?: string;
   theme?: MicrositeTheme;
 }
 
