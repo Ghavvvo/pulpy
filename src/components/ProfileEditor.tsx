@@ -29,7 +29,11 @@ interface ProfileData {
   coverType: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
-  cardStyle: 'professional' | 'social';
+  coverColor2?: string;
+  cardStyle: 'professional' | 'social' | 'company';
+  industry?: string;
+  website?: string;
+  businessHours?: string;
 }
 
 interface ProfileEditorProps {
