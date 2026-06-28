@@ -268,7 +268,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.coverImage !== undefined) profileUpdate.cover_image_url = data.coverImage;
       if (data.coverColor !== undefined) profileUpdate.cover_color = data.coverColor;
       if (data.cardStyle !== undefined) profileUpdate.card_style = data.cardStyle;
+      if (data.industry !== undefined) profileUpdate.industry = data.industry || null;
+      if (data.website !== undefined) profileUpdate.website = data.website || null;
+      if (data.businessHours !== undefined) profileUpdate.business_hours = data.businessHours || null;
       if (data.cvUrl !== undefined) profileUpdate.cv_url = data.cvUrl || null;
+      if (data.documentType !== undefined) profileUpdate.document_type = data.documentType || null;
+      if (data.documentLabel !== undefined) profileUpdate.document_label = data.documentLabel || null;
       if (data.theme !== undefined) profileUpdate.theme = data.theme || null;
       if (data.qrConfig !== undefined) profileUpdate.qr_config = data.qrConfig || null;
 
