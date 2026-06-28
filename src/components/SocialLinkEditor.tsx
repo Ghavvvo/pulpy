@@ -14,6 +14,7 @@ import {
   Plus,
   Trash2,
   GripVertical,
+  Crown,
   Instagram,
   Linkedin,
   Twitter,
@@ -71,6 +72,7 @@ interface SocialLinkEditorProps {
   links: SocialLink[];
   onLinksChange: (links: SocialLink[]) => void;
   embedded?: boolean;
+  isPremium?: boolean;
 }
 
 const platforms = [
@@ -179,7 +181,7 @@ const SortableLink = ({
   );
 };
 
-const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLinkEditorProps) => {
+const SocialLinkEditor = ({ links, onLinksChange, embedded = false, isPremium = false }: SocialLinkEditorProps) => {
   const [newLink, setNewLink] = useState<Partial<SocialLink>>({
     platform: "instagram",
     url: "",
@@ -208,6 +210,15 @@ const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLink
       toast({
         title: "Campos requeridos",
         description: "Por favor completa la URL y la etiqueta",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isPremium && links.length >= 3) {
+      toast({
+        title: "Límite alcanzado",
+        description: "Actualiza a Premium para añadir más de 3 enlaces",
         variant: "destructive",
       });
       return;
@@ -277,9 +288,23 @@ const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLink
       </DndContext>
 
       <div className="pt-4 border-t border-border">
-        <Label className="text-sm font-medium mb-3 block">Agregar nuevo enlace</Label>
+        <div className="flex items-center justify-between mb-3">
+          <Label className="text-sm font-medium">Agregar nuevo enlace</Label>
+          {!isPremium && links.length >= 3 && (
+            <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+              <Crown className="w-3 h-3 text-amber-500" /> Premium
+            </span>
+          )}
+        </div>
+        {!isPremium && links.length >= 3 && (
+          <p className="text-xs text-muted-foreground mb-3">Límite de 3 enlaces alcanzado. <a href="/pricing" className="underline underline-offset-2 hover:text-foreground">Actualiza a Premium</a> para añadir más.</p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <Select value={newLink.platform} onValueChange={(value) => setNewLink({ ...newLink, platform: value })}>
+          <Select
+            value={newLink.platform}
+            onValueChange={(value) => setNewLink({ ...newLink, platform: value })}
+            disabled={!isPremium && links.length >= 3}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Plataforma" />
             </SelectTrigger>
@@ -294,9 +319,23 @@ const SocialLinkEditor = ({ links, onLinksChange, embedded = false }: SocialLink
               ))}
             </SelectContent>
           </Select>
-          <Input placeholder="Etiqueta (ej: Mi Instagram)" value={newLink.label} onChange={(e) => setNewLink({ ...newLink, label: e.target.value })} />
-          <Input placeholder="URL" value={newLink.url} onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} />
-          <Button onClick={addLink} className="w-full">
+          <Input
+            placeholder="Etiqueta (ej: Mi Instagram)"
+            value={newLink.label}
+            onChange={(e) => setNewLink({ ...newLink, label: e.target.value })}
+            disabled={!isPremium && links.length >= 3}
+          />
+          <Input
+            placeholder="URL"
+            value={newLink.url}
+            onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+            disabled={!isPremium && links.length >= 3}
+          />
+          <Button
+            onClick={addLink}
+            disabled={!isPremium && links.length >= 3}
+            className="w-full"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Agregar
           </Button>

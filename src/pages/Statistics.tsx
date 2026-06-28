@@ -19,6 +19,7 @@ import {
   Smartphone,
   Monitor,
   Tablet,
+  Crown,
 } from "lucide-react";
 import {
   LineChart,
@@ -60,6 +61,53 @@ const PIE_COLORS = [
   "hsl(var(--chart-4, var(--primary) / 0.3))",
 ];
 
+const MOCK_DATA = {
+  totals: {
+    views: 123,
+    clicks: 123,
+    uniqueVisitors: 123,
+    conversionRate: 123,
+  },
+  daily: Array.from({ length: 7 }, (_, i) => ({
+    label: ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][i],
+    visits: 123,
+    clicks: 123,
+  })),
+  topLinks: [
+    { name: "Instagram", value: 123 },
+    { name: "YouTube", value: 123 },
+    { name: "LinkedIn", value: 123 },
+    { name: "Twitter", value: 123 },
+  ],
+  topCountries: [
+    { name: "Cuba", value: 123 },
+    { name: "España", value: 123 },
+    { name: "Estados Unidos", value: 123 },
+    { name: "México", value: 123 },
+  ],
+  devices: [
+    { name: "Móvil", value: 123 },
+    { name: "Escritorio", value: 123 },
+    { name: "Tablet", value: 123 },
+  ],
+  sources: [
+    { name: "direct", value: 123 },
+    { name: "qr", value: 123 },
+    { name: "social", value: 123 },
+    { name: "referral", value: 123 },
+  ],
+  recent: Array.from({ length: 5 }, (_, i) => ({
+    id: `mock-${i}`,
+    type: i % 2 === 0 ? "view" : "click",
+    label: i % 2 === 0 ? "Visita de ejemplo" : "Click en enlace de ejemplo",
+    createdAt: new Date(Date.now() - (i + 1) * 60000).toISOString(),
+    device: ["mobile", "desktop", "tablet", "mobile", "desktop"][i],
+    source: ["direct", "social", "qr", "referral", "direct"][i],
+    city: "Ciudad",
+    country: "País",
+  })),
+};
+
 function timeAgo(iso: string) {
   const diffMs = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diffMs / 60000);
@@ -72,11 +120,12 @@ function timeAgo(iso: string) {
 }
 
 const Statistics = () => {
-  const { user } = useAuth();
+  const { user, isPremium } = useAuth();
   const [range, setRange] = useState<StatsRange>("7d");
   const stats = useProfileStats(user?.id, range);
+  const display = isPremium ? stats : MOCK_DATA;
 
-  const conversionLabel = `${stats.totals.conversionRate}%`;
+  const conversionLabel = `${display.totals.conversionRate}%`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,27 +136,38 @@ const Statistics = () => {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Estadísticas</h1>
             <p className="text-muted-foreground mt-1">
-              Datos reales de tu tarjeta digital{stats.loading ? " · cargando…" : ""}
+              {isPremium ? "Datos reales de tu tarjeta digital" : "Datos de ejemplo"}
             </p>
           </div>
-          <Select value={range} onValueChange={(v) => setRange(v as StatsRange)}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Últimos 7 días</SelectItem>
-              <SelectItem value="30d">Últimos 30 días</SelectItem>
-              <SelectItem value="90d">Últimos 90 días</SelectItem>
-            </SelectContent>
-          </Select>
+          {isPremium && (
+            <Select value={range} onValueChange={(v) => setRange(v as StatsRange)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">Últimos 7 días</SelectItem>
+                <SelectItem value="30d">Últimos 30 días</SelectItem>
+                <SelectItem value="90d">Últimos 90 días</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
+        {!isPremium && (
+          <div className="rounded-xl bg-amber-50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-800 p-4 mb-6 flex items-center gap-3">
+            <Crown className="w-5 h-5 text-amber-500 shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              Estos son datos de ejemplo. <a href="/pricing" className="font-medium underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-100">Actualiza a Premium</a> para ver tus datos reales.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard title="Visitas totales" value={stats.totals.views.toLocaleString()} icon={Eye} />
-          <StatCard title="Clics en enlaces" value={stats.totals.clicks.toLocaleString()} icon={MousePointer} />
+          <StatCard title="Visitas totales" value={display.totals.views.toLocaleString()} icon={Eye} />
+          <StatCard title="Clics en enlaces" value={display.totals.clicks.toLocaleString()} icon={MousePointer} />
           <StatCard
             title="Visitantes únicos"
-            value={stats.totals.uniqueVisitors.toLocaleString()}
+            value={display.totals.uniqueVisitors.toLocaleString()}
             icon={Users}
           />
           <StatCard title="Tasa de conversión" value={conversionLabel} icon={TrendingUp} />
@@ -121,7 +181,7 @@ const Statistics = () => {
             <CardContent>
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={stats.daily}>
+                  <LineChart data={display.daily}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="label" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
@@ -162,13 +222,13 @@ const Statistics = () => {
             </CardHeader>
             <CardContent>
               <div className="h-72">
-                {stats.topLinks.length === 0 ? (
+                {display.topLinks.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
                     Aún no hay clics en este período.
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats.topLinks} layout="vertical">
+                    <BarChart data={display.topLinks} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
                       <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} width={90} />
@@ -196,11 +256,11 @@ const Statistics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {stats.topCountries.length === 0 ? (
+              {display.topCountries.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
               ) : (
                 <ul className="space-y-3">
-                  {stats.topCountries.map((c) => (
+                  {display.topCountries.map((c) => (
                     <li key={c.name} className="flex items-center justify-between">
                       <span className="text-sm font-medium">{c.name}</span>
                       <span className="text-sm text-muted-foreground">{c.value}</span>
@@ -217,13 +277,13 @@ const Statistics = () => {
             </CardHeader>
             <CardContent>
               <div className="h-56">
-                {stats.devices.length === 0 ? (
+                {display.devices.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Sin datos</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={stats.devices} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} paddingAngle={2}>
-                        {stats.devices.map((_, i) => (
+                      <Pie data={display.devices} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} paddingAngle={2}>
+                        {display.devices.map((_, i) => (
                           <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                         ))}
                       </Pie>
@@ -247,11 +307,11 @@ const Statistics = () => {
               <CardTitle className="text-lg">Fuentes de tráfico</CardTitle>
             </CardHeader>
             <CardContent>
-              {stats.sources.length === 0 ? (
+              {display.sources.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin datos todavía.</p>
               ) : (
                 <ul className="space-y-3">
-                  {stats.sources.map((s) => (
+                  {display.sources.map((s) => (
                     <li key={s.name} className="flex items-center justify-between">
                       <span className="text-sm font-medium capitalize">{sourceLabels[s.name] || s.name}</span>
                       <span className="text-sm text-muted-foreground">{s.value}</span>
@@ -268,13 +328,13 @@ const Statistics = () => {
             <CardTitle className="text-lg">Actividad reciente</CardTitle>
           </CardHeader>
           <CardContent>
-            {stats.recent.length === 0 ? (
+            {display.recent.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Aún no hay actividad. Comparte tu enlace para empezar a ver visitas.
               </p>
             ) : (
               <div className="space-y-3">
-                {stats.recent.map((a) => (
+                {display.recent.map((a) => (
                   <div
                     key={a.id}
                     className="flex items-center justify-between p-4 bg-secondary/30 rounded-xl"

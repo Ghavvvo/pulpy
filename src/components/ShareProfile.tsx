@@ -118,6 +118,7 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
           profileUrl={profileUrl}
           userId={user?.id}
           defaultLogo={user?.avatar}
+          isPremium={isPremium}
         />
 
         <div>

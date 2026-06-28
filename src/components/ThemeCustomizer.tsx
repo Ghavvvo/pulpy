@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Sparkles, Lock, Palette, Type, Image as ImageIcon, Loader2, Upload } from "lucide-react";
+import { Sparkles, Crown, Palette, Type, Image as ImageIcon, Loader2, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -185,8 +185,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               Color de acento
             </Label>
             {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
+              <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <Crown className="w-3 h-3 text-amber-500" /> Premium
               </span>
             )}
           </div>
@@ -195,13 +195,15 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               type="color"
               value={value.accentColor || "#7c3aed"}
               onChange={(e) => handleAccent(e.target.value)}
-              className="h-10 w-16 p-1 cursor-pointer"
+              disabled={!isPremium}
+              className="h-10 w-16 p-1 cursor-pointer disabled:cursor-not-allowed"
             />
             <Input
               type="text"
               placeholder="#7c3aed"
               value={value.accentColor || ""}
               onChange={(e) => handleAccent(e.target.value)}
+              disabled={!isPremium}
               className="flex-1"
             />
           </div>
@@ -215,8 +217,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               Color de la tarjeta
             </Label>
             {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
+              <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <Crown className="w-3 h-3 text-amber-500" /> Premium
               </span>
             )}
           </div>
@@ -225,13 +227,15 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               type="color"
               value={value.cardColor || "#ffffff"}
               onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
-              className="h-10 w-16 p-1 cursor-pointer"
+              disabled={!isPremium}
+              className="h-10 w-16 p-1 cursor-pointer disabled:cursor-not-allowed"
             />
             <Input
               type="text"
               placeholder="#ffffff"
               value={value.cardColor || ""}
               onChange={(e) => onChange({ ...value, cardColor: e.target.value })}
+              disabled={!isPremium}
               className="flex-1"
             />
           </div>
@@ -245,8 +249,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               Color de la fuente
             </Label>
             {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
+              <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <Crown className="w-3 h-3 text-amber-500" /> Premium
               </span>
             )}
           </div>
@@ -255,13 +259,15 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               type="color"
               value={value.textColor || "#111111"}
               onChange={(e) => onChange({ ...value, textColor: e.target.value })}
-              className="h-10 w-16 p-1 cursor-pointer"
+              disabled={!isPremium}
+              className="h-10 w-16 p-1 cursor-pointer disabled:cursor-not-allowed"
             />
             <Input
               type="text"
               placeholder="#111111"
               value={value.textColor || ""}
               onChange={(e) => onChange({ ...value, textColor: e.target.value })}
+              disabled={!isPremium}
               className="flex-1"
             />
           </div>
@@ -275,8 +281,8 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
               Tipografía
             </Label>
             {!isPremium && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3 h-3" /> Premium
+              <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <Crown className="w-3 h-3 text-amber-500" /> Premium
               </span>
             )}
           </div>
@@ -286,8 +292,10 @@ const ThemeCustomizer = ({ value, onChange, isPremium, embedded = false }: Props
                 key={f.id}
                 type="button"
                 onClick={() => handleFont(f.id)}
+                disabled={!isPremium}
                 className={cn(
                   "rounded-lg border-2 px-3 py-2 text-sm transition-all",
+                  !isPremium && "opacity-50 cursor-not-allowed",
                   (value.fontFamily || "default") === f.id
                     ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/40"

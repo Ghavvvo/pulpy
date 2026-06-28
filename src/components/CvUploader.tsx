@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, Upload, Trash2, Loader2, ExternalLink, BookOpen, UtensilsCrossed, Briefcase } from "lucide-react";
+import { FileText, Upload, Trash2, Loader2, ExternalLink, BookOpen, UtensilsCrossed, Briefcase, Crown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +32,7 @@ interface CvUploaderProps {
   onDocumentTypeChange?: (type: DocumentType) => Promise<void> | void;
   onDocumentLabelChange?: (label: string) => Promise<void> | void;
   embedded?: boolean;
+  isPremium?: boolean;
 }
 
 const CvUploader = ({
@@ -42,6 +43,7 @@ const CvUploader = ({
   onDocumentTypeChange,
   onDocumentLabelChange,
   embedded = false,
+  isPremium = false,
 }: CvUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
@@ -110,10 +112,21 @@ const CvUploader = ({
 
   const body = (
     <div className="space-y-4">
+      {!isPremium && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-800">
+          <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+            <Crown className="w-3 h-3 text-amber-500" /> Premium
+          </span>
+          <span className="text-xs text-amber-600 dark:text-amber-400">
+            <a href="/pricing" className="underline underline-offset-2 hover:text-amber-700 dark:hover:text-amber-300">Actualiza a Premium</a> para subir documentos
+          </span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label>Tipo de documento</Label>
-          <Select value={documentType} onValueChange={(v) => onDocumentTypeChange?.(v as DocumentType)}>
+          <Select value={documentType} onValueChange={(v) => onDocumentTypeChange?.(v as DocumentType)} disabled={!isPremium}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -136,6 +149,7 @@ const CvUploader = ({
               if ((labelDraft || "") !== (documentLabel || "")) onDocumentLabelChange?.(labelDraft);
             }}
             placeholder={meta.defaultBtn}
+            disabled={!isPremium}
           />
         </div>
       </div>
@@ -152,15 +166,15 @@ const CvUploader = ({
               Ver archivo <ExternalLink className="w-3 h-3" />
             </a>
           </div>
-          <Button variant="outline" size="sm" onClick={handleClick} disabled={uploading || removing}>
+          <Button variant="outline" size="sm" onClick={handleClick} disabled={uploading || removing || !isPremium}>
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
           </Button>
-          <Button variant="outline" size="sm" onClick={handleRemove} disabled={uploading || removing}>
+          <Button variant="outline" size="sm" onClick={handleRemove} disabled={uploading || removing || !isPremium}>
             {removing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
           </Button>
         </div>
       ) : (
-        <Button onClick={handleClick} disabled={uploading} className="w-full" variant="outline">
+        <Button onClick={handleClick} disabled={uploading || !isPremium} className="w-full" variant="outline">
           {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
           {uploading ? "Subiendo..." : `Subir ${meta.label} en PDF`}
         </Button>

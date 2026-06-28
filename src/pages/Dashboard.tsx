@@ -323,7 +323,7 @@ const Dashboard = () => {
                                         title="Enlaces"
                                         subtitle="Redes sociales y links a tu contenido"
                                     >
-                                        <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} embedded />
+                                        <SocialLinkEditor links={socialLinks} onLinksChange={setSocialLinks} embedded isPremium={isPremium} />
                                     </SectionItem>
 
                                     <SectionItem
@@ -341,6 +341,7 @@ const Dashboard = () => {
                                             onDocumentTypeChange={handleDocumentTypeChange}
                                             onDocumentLabelChange={handleDocumentLabelChange}
                                             embedded
+                                            isPremium={isPremium}
                                         />
                                     </SectionItem>
 

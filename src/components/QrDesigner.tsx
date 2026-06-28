@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download } from "lucide-react";
+import { Download, Crown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -25,6 +25,7 @@ interface QrDesignerProps {
   profileUrl: string;
   userId?: string;
   defaultLogo?: string;
+  isPremium?: boolean;
 }
 
 interface QrConfig {
@@ -80,7 +81,7 @@ const FRAME_OPTIONS = [
   { value: "custom", label: "Personalizado" },
 ] as const;
 
-const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
+const QrDesigner = ({ profileUrl, userId, defaultLogo, isPremium = false }: QrDesignerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const qrInstanceRef = useRef<QRCodeStyling | null>(null);
   const { user, updateProfile } = useAuth();
@@ -278,8 +279,19 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
         </Button>
       </div>
 
-      {/* Customization */}
+      {/* Personalización */}
       <div className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-center justify-between mb-1">
+          <Label className="text-sm font-medium">Personalización del QR</Label>
+          {!isPremium && (
+            <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+              <Crown className="w-3 h-3 text-amber-500" /> Premium
+            </span>
+          )}
+        </div>
+        {!isPremium && (
+          <p className="text-xs text-muted-foreground mb-3">Previsualiza los cambios. Se aplicarán en tu código QR al activar Premium.</p>
+        )}
         <Tabs defaultValue="style" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="style">Estilo</TabsTrigger>
@@ -294,6 +306,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 <Select
                   value={config.dotsType}
                   onValueChange={(v) => updateConfig({ dotsType: v as DotType })}
+                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -308,6 +321,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 <Select
                   value={config.cornersSquareType}
                   onValueChange={(v) => updateConfig({ cornersSquareType: v as CornerSquareType })}
+                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -322,6 +336,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 <Select
                   value={config.cornersDotType}
                   onValueChange={(v) => updateConfig({ cornersDotType: v as CornerDotType })}
+                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -340,16 +355,19 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 label="Puntos"
                 value={config.dotsColor}
                 onChange={(v) => updateConfig({ dotsColor: v })}
+                disabled={!isPremium}
               />
               <ColorField
                 label="Fondo"
                 value={config.bgColor}
                 onChange={(v) => updateConfig({ bgColor: v })}
+                disabled={!isPremium}
               />
               <ColorField
                 label="Esquinas"
                 value={config.cornersColor}
                 onChange={(v) => updateConfig({ cornersColor: v })}
+                disabled={!isPremium}
               />
             </div>
           </TabsContent>
@@ -361,6 +379,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 <Select
                   value={config.frame}
                   onValueChange={(v) => updateConfig({ frame: v as QrConfig["frame"] })}
+                  disabled={!isPremium}
                 >
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -374,6 +393,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                 label="Color del marco"
                 value={config.frameColor}
                 onChange={(v) => updateConfig({ frameColor: v })}
+                disabled={!isPremium}
               />
               {config.frame === "custom" && (
                 <div className="sm:col-span-2">
@@ -382,6 +402,7 @@ const QrDesigner = ({ profileUrl, userId, defaultLogo }: QrDesignerProps) => {
                     className="mt-1"
                     value={config.frameText}
                     onChange={(e) => updateConfig({ frameText: e.target.value.slice(0, 24) })}
+                    disabled={!isPremium}
                     placeholder="Ej: Sígueme en Instagram"
                   />
                 </div>
