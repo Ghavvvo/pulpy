@@ -28,6 +28,13 @@ interface PublicProfileData {
   coverImage?: string;
   coverColor?: string;
   cvUrl?: string;
+  documentType?: "cv" | "catalog" | "menu" | "portfolio";
+  documentLabel?: string;
+  cardStyle?: "professional" | "social" | "company";
+  industry?: string;
+  website?: string;
+  businessHours?: string;
+  email?: string;
   socialLinks: SocialLink[];
   theme?: MicrositeTheme;
   isPremium?: boolean;
