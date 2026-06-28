@@ -133,7 +133,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         coverImage: profile.cover_image_url,
         coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         cardStyle: profile.card_style || 'professional',
+        industry: profile.industry || undefined,
+        website: profile.website || undefined,
+        businessHours: profile.business_hours || undefined,
         cvUrl: profile.cv_url || undefined,
+        documentType: profile.document_type || undefined,
+        documentLabel: profile.document_label || undefined,
         theme: profile.theme || undefined,
         qrConfig: profile.qr_config || undefined,
         socialLinks: (socialLinks || []).map(link => ({
