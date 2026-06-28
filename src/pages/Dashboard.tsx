@@ -173,7 +173,12 @@ const Dashboard = () => {
                 coverColor: user.coverColor,
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
+                industry: user.industry,
+                website: user.website,
+                businessHours: user.businessHours,
                 cvUrl: user.cvUrl,
+                documentType: user.documentType,
+                documentLabel: user.documentLabel,
                 theme: user.theme || { preset: DEFAULT_THEME },
             };
 
