@@ -18,8 +18,13 @@ interface User {
   coverType: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
-  cardStyle: 'professional' | 'social';
+  cardStyle: 'professional' | 'social' | 'company';
+  industry?: string;
+  website?: string;
+  businessHours?: string;
   cvUrl?: string;
+  documentType?: 'cv' | 'catalog' | 'menu' | 'portfolio';
+  documentLabel?: string;
   theme?: MicrositeTheme;
   qrConfig?: Record<string, unknown>;
   socialLinks: SocialLink[];
@@ -128,7 +133,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         coverImage: profile.cover_image_url,
         coverColor: profile.cover_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         cardStyle: profile.card_style || 'professional',
+        industry: profile.industry || undefined,
+        website: profile.website || undefined,
+        businessHours: profile.business_hours || undefined,
         cvUrl: profile.cv_url || undefined,
+        documentType: profile.document_type || undefined,
+        documentLabel: profile.document_label || undefined,
         theme: profile.theme || undefined,
         qrConfig: profile.qr_config || undefined,
         socialLinks: (socialLinks || []).map(link => ({
@@ -258,7 +268,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.coverImage !== undefined) profileUpdate.cover_image_url = data.coverImage;
       if (data.coverColor !== undefined) profileUpdate.cover_color = data.coverColor;
       if (data.cardStyle !== undefined) profileUpdate.card_style = data.cardStyle;
+      if (data.industry !== undefined) profileUpdate.industry = data.industry || null;
+      if (data.website !== undefined) profileUpdate.website = data.website || null;
+      if (data.businessHours !== undefined) profileUpdate.business_hours = data.businessHours || null;
       if (data.cvUrl !== undefined) profileUpdate.cv_url = data.cvUrl || null;
+      if (data.documentType !== undefined) profileUpdate.document_type = data.documentType || null;
+      if (data.documentLabel !== undefined) profileUpdate.document_label = data.documentLabel || null;
       if (data.theme !== undefined) profileUpdate.theme = data.theme || null;
       if (data.qrConfig !== undefined) profileUpdate.qr_config = data.qrConfig || null;
 

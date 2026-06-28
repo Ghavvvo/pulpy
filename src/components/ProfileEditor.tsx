@@ -29,7 +29,10 @@ interface ProfileData {
   coverType: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
-  cardStyle: 'professional' | 'social';
+  cardStyle: 'professional' | 'social' | 'company';
+  industry?: string;
+  website?: string;
+  businessHours?: string;
 }
 
 interface ProfileEditorProps {
@@ -149,7 +152,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave, section = 'all', 
         <Label htmlFor="cardStyle">Estilo de tarjeta</Label>
         <Select
           value={profile.cardStyle}
-          onValueChange={(value: 'professional' | 'social') => onProfileChange({ ...profile, cardStyle: value })}
+          onValueChange={(value: 'professional' | 'social' | 'company') => onProfileChange({ ...profile, cardStyle: value })}
         >
           <SelectTrigger id="cardStyle">
             <SelectValue placeholder="Selecciona un estilo" />
@@ -165,6 +168,12 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave, section = 'all', 
               <div className="flex text-start flex-col">
                 <span className="font-medium">Social Media</span>
                 <span className="text-xs text-muted-foreground">Estilo Linktree centrado</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="company">
+              <div className="flex text-start flex-col">
+                <span className="font-medium">Empresa</span>
+                <span className="text-xs text-muted-foreground">Tarjeta para negocios, marcas o locales</span>
               </div>
             </SelectItem>
           </SelectContent>
@@ -238,7 +247,47 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave, section = 'all', 
     </div>
   );
 
+  const CompanyForm = (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Nombre de la empresa</Label>
+          <Input id="name" value={profile.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Ej: Café Aurora S.A." />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="industry">Sector / Industria</Label>
+          <Input id="industry" value={profile.industry || ''} onChange={(e) => updateField("industry", e.target.value)} placeholder="Ej: Restaurante, Tecnología, Retail" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="location">Ubicación</Label>
+          <Input id="location" value={profile.location} onChange={(e) => updateField("location", e.target.value)} placeholder="Ciudad, País" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Teléfono</Label>
+          <Input id="phone" value={profile.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="+1 234 567 890" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email de contacto</Label>
+          <Input id="email" type="email" value={profile.email} onChange={(e) => updateField("email", e.target.value)} placeholder="contacto@empresa.com" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="website">Sitio web</Label>
+          <Input id="website" value={profile.website || ''} onChange={(e) => updateField("website", e.target.value)} placeholder="https://miempresa.com" />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="businessHours">Horario</Label>
+          <Input id="businessHours" value={profile.businessHours || ''} onChange={(e) => updateField("businessHours", e.target.value)} placeholder="Lun–Vie 9:00–18:00" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="bio">Descripción</Label>
+        <Textarea id="bio" value={profile.bio} onChange={(e) => updateField("bio", e.target.value)} placeholder="Cuéntanos sobre tu empresa, productos o servicios..." rows={3} />
+      </div>
+    </div>
+  );
+
   const InfoSection = (
+    profile.cardStyle === 'company' ? CompanyForm :
     profile.cardStyle === 'professional' ? (
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

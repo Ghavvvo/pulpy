@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone, FileText } from "lucide-react";
+import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone, FileText, BookOpen, UtensilsCrossed, Briefcase, Mail, Clock } from "lucide-react";
 import PulpyWatermark from "@/components/PulpyWatermark";
 import { THEME_PRESETS, FONT_OPTIONS, MicrositeTheme, hexToHslVar, DEFAULT_THEME } from "@/lib/themes";
 
@@ -28,6 +28,13 @@ interface PublicProfileData {
   coverImage?: string;
   coverColor?: string;
   cvUrl?: string;
+  documentType?: "cv" | "catalog" | "menu" | "portfolio";
+  documentLabel?: string;
+  cardStyle?: "professional" | "social" | "company";
+  industry?: string;
+  website?: string;
+  businessHours?: string;
+  email?: string;
   socialLinks: SocialLink[];
   theme?: MicrositeTheme;
   isPremium?: boolean;
@@ -127,10 +134,16 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
               </Avatar>
 
               <h1 className="text-2xl sm:text-3xl font-bold mt-4">{profile.name}</h1>
-              {(profile.title || profile.company) && (
-                <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>
-                  {[profile.title, profile.company].filter(Boolean).join(" · ")}
-                </p>
+              {profile.cardStyle === "company" ? (
+                profile.industry && (
+                  <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>{profile.industry}</p>
+                )
+              ) : (
+                (profile.title || profile.company) && (
+                  <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>
+                    {[profile.title, profile.company].filter(Boolean).join(" · ")}
+                  </p>
+                )
               )}
               <Badge
                 variant="secondary"
@@ -156,18 +169,29 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
                   <Download className="w-4 h-4 mr-2" />
                   Guardar contacto
                 </Button>
-                {profile.cvUrl && (
-                  <Button asChild size="lg" variant="outline" className="w-full"
-                    style={{ borderColor: "hsl(var(--ms-border))", color: "hsl(var(--ms-fg))", background: "transparent" }}>
-                    <a href={profile.cvUrl} target="_blank" rel="noopener noreferrer" download>
-                      <FileText className="w-4 h-4 mr-2" />
-                      Descargar CV
-                    </a>
-                  </Button>
-                )}
+                {profile.cvUrl && (() => {
+                  const type = profile.documentType || "cv";
+                  const defaults: Record<string, { label: string; icon: JSX.Element }> = {
+                    cv: { label: "Descargar CV", icon: <FileText className="w-4 h-4 mr-2" /> },
+                    catalog: { label: "Ver catálogo", icon: <BookOpen className="w-4 h-4 mr-2" /> },
+                    menu: { label: "Ver menú", icon: <UtensilsCrossed className="w-4 h-4 mr-2" /> },
+                    portfolio: { label: "Ver portafolio", icon: <Briefcase className="w-4 h-4 mr-2" /> },
+                  };
+                  const d = defaults[type];
+                  const label = profile.documentLabel?.trim() || d.label;
+                  return (
+                    <Button asChild size="lg" variant="outline" className="w-full"
+                      style={{ borderColor: "hsl(var(--ms-border))", color: "hsl(var(--ms-fg))", background: "transparent" }}>
+                      <a href={profile.cvUrl} target="_blank" rel="noopener noreferrer">
+                        {d.icon}
+                        {label}
+                      </a>
+                    </Button>
+                  );
+                })()}
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-sm" style={{ color: "hsl(var(--ms-muted-fg))" }}>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm" style={{ color: "hsl(var(--ms-muted-fg))" }}>
                 {profile.location && (
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
@@ -180,7 +204,26 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
                     {profile.phone}
                   </span>
                 )}
+                {profile.cardStyle === "company" && profile.email && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Mail className="w-4 h-4" />
+                    {profile.email}
+                  </span>
+                )}
+                {profile.cardStyle === "company" && profile.website && (
+                  <a href={profile.website.startsWith("http") ? profile.website : `https://${profile.website}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:underline">
+                    <Globe className="w-4 h-4" />
+                    {profile.website.replace(/^https?:\/\//, "")}
+                  </a>
+                )}
+                {profile.cardStyle === "company" && profile.businessHours && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock className="w-4 h-4" />
+                    {profile.businessHours}
+                  </span>
+                )}
               </div>
+
             </div>
 
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">

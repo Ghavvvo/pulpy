@@ -70,8 +70,13 @@ interface ProfileData {
     coverType: 'color' | 'image';
     coverImage?: string;
     coverColor?: string;
-    cardStyle: 'professional' | 'social';
+    cardStyle: 'professional' | 'social' | 'company';
+    industry?: string;
+    website?: string;
+    businessHours?: string;
     cvUrl?: string;
+    documentType?: 'cv' | 'catalog' | 'menu' | 'portfolio';
+    documentLabel?: string;
     theme?: MicrositeTheme;
 }
 
@@ -92,7 +97,12 @@ const Dashboard = () => {
         coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         coverImage: user?.coverImage,
         cardStyle: user?.cardStyle || 'professional',
+        industry: user?.industry,
+        website: user?.website,
+        businessHours: user?.businessHours,
         cvUrl: user?.cvUrl,
+        documentType: user?.documentType,
+        documentLabel: user?.documentLabel,
         theme: user?.theme || { preset: DEFAULT_THEME },
     });
 
@@ -136,7 +146,12 @@ const Dashboard = () => {
             coverColor: user?.coverColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             coverImage: user?.coverImage,
             cardStyle: user?.cardStyle || 'professional',
+            industry: user?.industry,
+            website: user?.website,
+            businessHours: user?.businessHours,
             cvUrl: user?.cvUrl,
+            documentType: user?.documentType,
+            documentLabel: user?.documentLabel,
             theme: user?.theme || { preset: DEFAULT_THEME },
         },
         socialLinks: user?.socialLinks || [],
@@ -158,7 +173,12 @@ const Dashboard = () => {
                 coverColor: user.coverColor,
                 coverImage: user.coverImage,
                 cardStyle: user.cardStyle,
+                industry: user.industry,
+                website: user.website,
+                businessHours: user.businessHours,
                 cvUrl: user.cvUrl,
+                documentType: user.documentType,
+                documentLabel: user.documentLabel,
                 theme: user.theme || { preset: DEFAULT_THEME },
             };
 
@@ -216,7 +236,19 @@ const Dashboard = () => {
     const handleCvChange = async (url: string | null) => {
         const nextProfile = { ...profile, cvUrl: url || undefined };
         setProfile(nextProfile);
-        await persistProfile(nextProfile, socialLinks, "Tu CV se guardó automáticamente");
+        await persistProfile(nextProfile, socialLinks, "Tu documento se guardó automáticamente");
+    };
+
+    const handleDocumentTypeChange = async (type: 'cv' | 'catalog' | 'menu' | 'portfolio') => {
+        const nextProfile = { ...profile, documentType: type };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Tipo de documento actualizado");
+    };
+
+    const handleDocumentLabelChange = async (label: string) => {
+        const nextProfile = { ...profile, documentLabel: label || undefined };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Texto del botón actualizado");
     };
 
     const profileUrl = `${window.location.origin}/${username}`;
@@ -298,10 +330,18 @@ const Dashboard = () => {
                                         id="docs"
                                         step={4}
                                         icon={<FileText className="w-4 h-4" />}
-                                        title="Documentos"
-                                        subtitle="CV o currículum descargable en PDF"
+                                        title="Documento PDF"
+                                        subtitle="CV, catálogo, menú o portafolio descargable"
                                     >
-                                        <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} embedded />
+                                        <CvUploader
+                                            cvUrl={profile.cvUrl}
+                                            documentType={profile.documentType}
+                                            documentLabel={profile.documentLabel}
+                                            onCvChange={handleCvChange}
+                                            onDocumentTypeChange={handleDocumentTypeChange}
+                                            onDocumentLabelChange={handleDocumentLabelChange}
+                                            embedded
+                                        />
                                     </SectionItem>
 
                                     <SectionItem

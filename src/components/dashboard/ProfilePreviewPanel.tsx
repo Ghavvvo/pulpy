@@ -24,8 +24,13 @@ interface ProfileData {
   coverType: "color" | "image";
   coverImage?: string;
   coverColor?: string;
-  cardStyle: "professional" | "social";
+  cardStyle: "professional" | "social" | "company";
+  industry?: string;
+  website?: string;
+  businessHours?: string;
   cvUrl?: string;
+  documentType?: "cv" | "catalog" | "menu" | "portfolio";
+  documentLabel?: string;
   theme?: MicrositeTheme;
 }
 
@@ -70,7 +75,12 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
                 coverImage: profile.coverImage,
                 coverColor: profile.coverColor,
                 cardStyle: profile.cardStyle,
+                industry: profile.industry,
+                website: profile.website,
+                businessHours: profile.businessHours,
                 cvUrl: profile.cvUrl,
+                documentType: profile.documentType,
+                documentLabel: profile.documentLabel,
                 theme: profile.theme,
                 isPremium,
                 socialLinks,
@@ -99,6 +109,12 @@ const ProfilePreviewPanel = ({ username, profile, socialLinks }: ProfilePreviewP
               coverImage: profile.coverImage,
               coverColor: profile.coverColor,
               cvUrl: profile.cvUrl,
+              documentType: profile.documentType,
+              documentLabel: profile.documentLabel,
+              cardStyle: profile.cardStyle,
+              industry: profile.industry,
+              website: profile.website,
+              businessHours: profile.businessHours,
               socialLinks,
               theme: profile.theme,
               isPremium: true,
