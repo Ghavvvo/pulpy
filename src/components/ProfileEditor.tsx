@@ -29,7 +29,6 @@ interface ProfileData {
   coverType: 'color' | 'image';
   coverImage?: string;
   coverColor?: string;
-  coverColor2?: string;
   cardStyle: 'professional' | 'social' | 'company';
   industry?: string;
   website?: string;
