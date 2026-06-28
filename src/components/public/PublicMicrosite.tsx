@@ -134,10 +134,16 @@ const PublicMicrosite = ({ profile, onDownloadVcf, onLinkClick, showWatermark = 
               </Avatar>
 
               <h1 className="text-2xl sm:text-3xl font-bold mt-4">{profile.name}</h1>
-              {(profile.title || profile.company) && (
-                <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>
-                  {[profile.title, profile.company].filter(Boolean).join(" · ")}
-                </p>
+              {profile.cardStyle === "company" ? (
+                profile.industry && (
+                  <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>{profile.industry}</p>
+                )
+              ) : (
+                (profile.title || profile.company) && (
+                  <p className="mt-1" style={{ color: "hsl(var(--ms-muted-fg))" }}>
+                    {[profile.title, profile.company].filter(Boolean).join(" · ")}
+                  </p>
+                )
               )}
               <Badge
                 variant="secondary"
