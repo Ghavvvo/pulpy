@@ -330,10 +330,18 @@ const Dashboard = () => {
                                         id="docs"
                                         step={4}
                                         icon={<FileText className="w-4 h-4" />}
-                                        title="Documentos"
-                                        subtitle="CV o currículum descargable en PDF"
+                                        title="Documento PDF"
+                                        subtitle="CV, catálogo, menú o portafolio descargable"
                                     >
-                                        <CvUploader cvUrl={profile.cvUrl} onCvChange={handleCvChange} embedded />
+                                        <CvUploader
+                                            cvUrl={profile.cvUrl}
+                                            documentType={profile.documentType}
+                                            documentLabel={profile.documentLabel}
+                                            onCvChange={handleCvChange}
+                                            onDocumentTypeChange={handleDocumentTypeChange}
+                                            onDocumentLabelChange={handleDocumentLabelChange}
+                                            embedded
+                                        />
                                     </SectionItem>
 
                                     <SectionItem
