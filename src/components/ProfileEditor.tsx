@@ -152,7 +152,7 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave, section = 'all', 
         <Label htmlFor="cardStyle">Estilo de tarjeta</Label>
         <Select
           value={profile.cardStyle}
-          onValueChange={(value: 'professional' | 'social') => onProfileChange({ ...profile, cardStyle: value })}
+          onValueChange={(value: 'professional' | 'social' | 'company') => onProfileChange({ ...profile, cardStyle: value })}
         >
           <SelectTrigger id="cardStyle">
             <SelectValue placeholder="Selecciona un estilo" />
@@ -168,6 +168,12 @@ const ProfileEditor = ({ profile, onProfileChange, onAutoSave, section = 'all', 
               <div className="flex text-start flex-col">
                 <span className="font-medium">Social Media</span>
                 <span className="text-xs text-muted-foreground">Estilo Linktree centrado</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="company">
+              <div className="flex text-start flex-col">
+                <span className="font-medium">Empresa</span>
+                <span className="text-xs text-muted-foreground">Tarjeta para negocios, marcas o locales</span>
               </div>
             </SelectItem>
           </SelectContent>
