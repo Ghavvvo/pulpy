@@ -175,7 +175,7 @@ const Header = () => {
 
       {/* Mobile sub-nav */}
       {isAuthenticated && user && !isLanding && (
-        <nav className="md:hidden flex items-center gap-1 px-3 pb-2 overflow-x-auto border-t border-border/50 pt-2">
+        <nav className="md:hidden flex justify-center items-center gap-1 px-3 pb-2  overflow-x-auto border-t border-border/50 pt-2">
           {navItems.map((item) => (
             <Link
               key={item.id}
