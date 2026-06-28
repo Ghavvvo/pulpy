@@ -85,16 +85,13 @@ const Header = () => {
         )}
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <ThemeToggle />
 
           {isLanding ? (
             <>
               <Button variant="ghost" asChild>
                 <Link to="/login">Iniciar sesión</Link>
               </Button>
-              <Button asChild>
-                <Link to="/signup">Comenzar gratis</Link>
-              </Button>
+
             </>
           ) : isAuthenticated && user ? (
             <>
