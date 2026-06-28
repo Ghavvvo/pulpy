@@ -257,10 +257,10 @@ const Dashboard = () => {
         <div className="min-h-screen bg-background">
             <Header/>
 
-                {/* Premium Alert */}
+                {/* Premium Alert
                 <div className="mb-6">
                     <PremiumAlert />
-                </div>
+                </div>*/}
 
             <main className="container mx-auto px-4 pt-32 md:pt-24 pb-12">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">

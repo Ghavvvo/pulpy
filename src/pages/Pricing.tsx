@@ -241,7 +241,7 @@ const Pricing = () => {
             Contáctanos por WhatsApp y te ayudamos a elegir el mejor plan para ti.
           </p>
           <Button variant="outline" size="lg" asChild>
-            <a href="https://wa.me/+5352123456" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/+5354702549" target="_blank" rel="noopener noreferrer">
               Contactar soporte
             </a>
           </Button>
