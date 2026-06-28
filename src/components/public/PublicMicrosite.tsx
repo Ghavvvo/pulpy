@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone, FileText } from "lucide-react";
+import { Download, Globe, Linkedin, Twitter, Instagram, Github, MapPin, Phone, FileText, BookOpen, UtensilsCrossed, Briefcase, Mail, Clock } from "lucide-react";
 import PulpyWatermark from "@/components/PulpyWatermark";
 import { THEME_PRESETS, FONT_OPTIONS, MicrositeTheme, hexToHslVar, DEFAULT_THEME } from "@/lib/themes";
 
