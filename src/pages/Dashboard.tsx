@@ -236,7 +236,19 @@ const Dashboard = () => {
     const handleCvChange = async (url: string | null) => {
         const nextProfile = { ...profile, cvUrl: url || undefined };
         setProfile(nextProfile);
-        await persistProfile(nextProfile, socialLinks, "Tu CV se guardó automáticamente");
+        await persistProfile(nextProfile, socialLinks, "Tu documento se guardó automáticamente");
+    };
+
+    const handleDocumentTypeChange = async (type: 'cv' | 'catalog' | 'menu' | 'portfolio') => {
+        const nextProfile = { ...profile, documentType: type };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Tipo de documento actualizado");
+    };
+
+    const handleDocumentLabelChange = async (label: string) => {
+        const nextProfile = { ...profile, documentLabel: label || undefined };
+        setProfile(nextProfile);
+        await persistProfile(nextProfile, socialLinks, "Texto del botón actualizado");
     };
 
     const profileUrl = `${window.location.origin}/${username}`;
