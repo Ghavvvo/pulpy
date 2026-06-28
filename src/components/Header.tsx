@@ -88,7 +88,7 @@ const Header = () => {
 
           {isLanding ? (
             <>
-              <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Button variant="ghost" asChild>
                 <Link to="/login">Iniciar sesión</Link>
               </Button>
 
@@ -175,13 +175,13 @@ const Header = () => {
 
       {/* Mobile sub-nav */}
       {isAuthenticated && user && !isLanding && (
-        <nav className="md:hidden grid grid-cols-3 gap-1 px-3 pb-2 border-t border-border/50 pt-2">
+        <nav className="md:hidden flex justify-center items-center gap-1 px-3 pb-2  overflow-x-auto border-t border-border/50 pt-2">
           {navItems.map((item) => (
             <Link
               key={item.id}
               to={item.to}
               className={cn(
-                "flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-colors",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-colors",
                 item.active
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted",
