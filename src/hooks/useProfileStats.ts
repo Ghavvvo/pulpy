@@ -46,6 +46,12 @@ const rangeToDays: Record<StatsRange, number> = { "7d": 7, "30d": 30, "90d": 90 
 
 const dayLabels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
+const deviceLabels: Record<string, string> = {
+  mobile: "Móvil",
+  tablet: "Tablet",
+  desktop: "Escritorio",
+};
+
 function startDate(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() - (days - 1));
@@ -115,7 +121,7 @@ export function useProfileStats(profileId: string | undefined, range: StatsRange
       const days = rangeToDays[range];
       const since = startDate(days);
 
-      const [viewsRes, clicksRes] = await Promise.all([
+      const [viewsRes, clicksRes, socialRes] = await Promise.all([
         supabase
           .from("profile_views")
           .select("id, source, country, city, device, browser, os, user_agent, created_at")
@@ -124,16 +130,25 @@ export function useProfileStats(profileId: string | undefined, range: StatsRange
           .order("created_at", { ascending: false }),
         supabase
           .from("link_clicks")
-          .select("id, platform, label, source, country, city, device, created_at")
+          .select("id, link_id, platform, label, source, country, city, device, created_at")
           .eq("profile_id", profileId)
           .gte("created_at", since)
           .order("created_at", { ascending: false }),
+        supabase
+          .from("social_links")
+          .select("id, label, platform")
+          .eq("user_id", profileId),
       ]);
 
       if (cancelled) return;
 
       const views = viewsRes.data || [];
       const clicks = clicksRes.data || [];
+
+      const labelMap: Record<string, string> = {};
+      for (const link of socialRes.data || []) {
+        labelMap[link.id] = link.label || link.platform;
+      }
 
       const uniqueVisitors = new Set(views.map((v: any) => v.user_agent || v.id)).size;
       const totalViews = views.length;
@@ -154,7 +169,7 @@ export function useProfileStats(profileId: string | undefined, range: StatsRange
         ...clicks.slice(0, 10).map((c: any) => ({
           id: `c-${c.id}`,
           type: "click" as const,
-          label: c.label || c.platform || "Enlace",
+          label: labelMap[c.link_id] || c.label || c.platform || "Enlace",
           source: c.source || "direct",
           country: c.country,
           city: c.city,
@@ -174,9 +189,11 @@ export function useProfileStats(profileId: string | undefined, range: StatsRange
           conversionRate: Math.round(conversion * 10) / 10,
         },
         daily: buildDaily(views, clicks, days),
-        topLinks: tally(clicks, (c: any) => c.label || c.platform),
+        topLinks: tally(clicks, (c: any) => {
+  return labelMap[c.link_id] || c.label || c.platform;
+}),
         topCountries: tally(views, (v: any) => v.country),
-        devices: tally(views, (v: any) => v.device, 4),
+        devices: tally(views, (v: any) => deviceLabels[v.device] || v.device || "Desconocido", 4),
         sources: tally(views, (v: any) => v.source, 6),
         recent,
       });

@@ -286,14 +286,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Handle social links updates
       if (data.socialLinks) {
-        // Delete existing links
-        await supabase
+        const { data: existing } = await supabase
           .from('social_links')
-          .delete()
+          .select('id')
           .eq('user_id', user.id);
 
-        // Insert new links
-        const linksToInsert = data.socialLinks.map((link, index) => ({
+        const dbIds = new Set((existing || []).map((l: any) => l.id));
+        const incomingIds = new Set(
+          data.socialLinks.filter((l) => l.id && dbIds.has(l.id)).map((l) => l.id!)
+        );
+
+        // Delete removed links
+        const toDelete = [...dbIds].filter((id) => !incomingIds.has(id));
+        if (toDelete.length > 0) {
+          await supabase.from('social_links').delete().in('id', toDelete);
+        }
+
+        // Upsert existing + insert new
+        const linksToSave = data.socialLinks.map((link, index) => ({
+          ...(link.id && dbIds.has(link.id) ? { id: link.id } : {}),
           user_id: user.id,
           platform: link.platform,
           url: link.url,
@@ -301,10 +312,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           display_order: index,
         }));
 
-        if (linksToInsert.length > 0) {
+        if (linksToSave.length > 0) {
           const { error: linksError } = await supabase
             .from('social_links')
-            .insert(linksToInsert);
+            .upsert(linksToSave);
 
           if (linksError) throw linksError;
         }
