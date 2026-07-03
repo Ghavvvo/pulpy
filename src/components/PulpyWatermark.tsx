@@ -8,7 +8,7 @@ const PulpyWatermark = ({ variant = "card" }: PulpyWatermarkProps) => {
   if (variant === "floating") {
     return (
       <a
-        href="https://pulpy.app"
+        href={window.location.origin}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 inline-flex flex-col items-center gap-0.5"
@@ -24,7 +24,7 @@ const PulpyWatermark = ({ variant = "card" }: PulpyWatermarkProps) => {
   // "card" variant: logo del pulpo + texto, esquina inferior derecha, sin contorno
   return (
     <a
-      href="https://pulpy.app"
+      href={window.location.origin}
       target="_blank"
       rel="noopener noreferrer"
       title="Hecho con Pulpy"

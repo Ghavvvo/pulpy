@@ -56,7 +56,7 @@ const Index = () => {
 
         <div className="container mx-auto px-4 relative z-10 pt-10">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full ">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mt-10 ">
                 <img className="h-40" src={Logo} alt=""/>
             </div>
             
