@@ -14,7 +14,7 @@ import {useAuth} from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
 import ProfilePreviewPanel from "@/components/dashboard/ProfilePreviewPanel";
-import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+// import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 import CvUploader from "@/components/CvUploader";
 import ThemeCustomizer from "@/components/ThemeCustomizer";
 import { MicrositeTheme, DEFAULT_THEME } from "@/lib/themes";
@@ -123,15 +123,15 @@ const Dashboard = () => {
     };
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-    const [showOnboarding, setShowOnboarding] = useState(() => {
-        if (!user) return false;
-        return localStorage.getItem(`pulpy_onboarded_${user.id}`) !== "1";
-    });
+    // const [showOnboarding, setShowOnboarding] = useState(() => {
+    //     if (!user) return false;
+    //     return localStorage.getItem(`pulpy_onboarded_${user.id}`) !== "1";
+    // });
 
-    const handleOnboardingComplete = () => {
-        if (user) localStorage.setItem(`pulpy_onboarded_${user.id}`, "1");
-        setShowOnboarding(false);
-    };
+    // const handleOnboardingComplete = () => {
+    //     if (user) localStorage.setItem(`pulpy_onboarded_${user.id}`, "1");
+    //     setShowOnboarding(false);
+    // };
     const [lastSavedSnapshot, setLastSavedSnapshot] = useState(() => JSON.stringify({
         profile: {
             name: user?.name || "",
@@ -404,7 +404,7 @@ const Dashboard = () => {
                 )}
             </main>
 
-            <OnboardingWizard open={showOnboarding} onComplete={handleOnboardingComplete} />
+            {/* <OnboardingWizard open={showOnboarding} onComplete={handleOnboardingComplete} /> */}
         </div>
     );
 };

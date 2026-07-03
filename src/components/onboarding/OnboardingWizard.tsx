@@ -1,3 +1,4 @@
+/* --- ONBOARDING COMENTADO ---
 import { useState, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -98,9 +99,9 @@ const OnboardingWizard = ({ open, onComplete }: OnboardingWizardProps) => {
   };
 
   const canAdvance = () => {
-    if (step === 1) return true; // skippable
-    if (step === 2) return true; // skippable
-    if (step === 3) return true; // skippable
+    if (step === 1) return true;
+    if (step === 2) return true;
+    if (step === 3) return true;
     return true;
   };
 
@@ -277,3 +278,4 @@ const OnboardingWizard = ({ open, onComplete }: OnboardingWizardProps) => {
 };
 
 export default OnboardingWizard;
+--- FIN ONBOARDING COMENTADO */
