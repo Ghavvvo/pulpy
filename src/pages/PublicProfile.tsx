@@ -15,15 +15,25 @@ const PublicProfile = () => {
   const handleDownloadVcf = () => {
     if (!profile) return;
 
-    // Paso 2: Crear contenido VCF
+    const nameParts = profile.name?.trim().split(/\s+/) || [];
+    const givenName = nameParts[0] || '';
+    const familyName = nameParts.slice(1).join(' ') || '';
+
     const vcfContent = `BEGIN:VCARD
 VERSION:3.0
+N:${familyName};${givenName};;;
 FN:${profile.name}
+NICKNAME:${profile.username || ''}
+${profile.avatar ? `PHOTO;VALUE=URI:${profile.avatar}` : ''}
 TEL:${profile.phone || ''}
 EMAIL:${profile.email || ''}
 ORG:${profile.company || ''}
 TITLE:${profile.title || ''}
+ADR;TYPE=WORK:;;${profile.location || ''};;;;
 URL:${window.location.href}
+${profile.website ? `URL;TYPE=WORK:${profile.website}` : ''}
+REV:${new Date().toISOString()}
+UID:${profile.id || ''}
 NOTE:${profile.bio || ''}
 END:VCARD`;
 

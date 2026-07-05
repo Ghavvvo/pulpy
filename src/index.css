@@ -189,9 +189,9 @@ All colors MUST be HSL.
     transform: rotateY(180deg);
   }
   @keyframes flip-loop {
-    0%, 40% { transform: rotateY(0deg); }
-    50%, 90% { transform: rotateY(180deg); }
-    100% { transform: rotateY(360deg); }
+    0%, 5%    { transform: rotateY(0deg); }
+    48%, 52%  { transform: rotateY(180deg); }
+    95%, 100% { transform: rotateY(360deg); }
   }
   @media (prefers-reduced-motion: reduce) {
     .flip-card-inner { animation: none; }
