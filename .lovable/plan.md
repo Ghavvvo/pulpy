@@ -1,80 +1,47 @@
-# Plan: Tarjeta Empresa + PDF tipado
+# Rediseño de la Home de Pulpy
 
-## 1. Nuevo `cardStyle: 'company'` (gratis para todos)
+## Objetivo
+Comunicar con claridad qué es Pulpy hoy: **crear tu perfil digital, centralizar tus redes sociales y compartir tu info fácilmente** — sin mencionar NFC. Añadir una **tarjeta de ejemplo giratoria** (flip 3D CSS) como pieza visual central.
 
-Extender el tipo `ProfileData.cardStyle` a `'professional' | 'social' | 'company'`.
+## Cambios de contenido (copy)
 
-**Campos Empresa (set básico):**
+**Hero**
+- Badge: "Tu presencia digital, en una sola tarjeta"
+- H1: "Tu perfil digital, todo en un enlace"
+- Subtítulo: "Crea tu tarjeta de presentación digital con tus redes sociales, contacto y enlaces. Compártela con un QR o un link y descubre quién conecta contigo."
+- CTAs: "Crear mi tarjeta gratis" / "Ver ejemplo"
+- Trust badges: se mantienen (gratis, sin tarjeta, 2 min)
 
-- Nombre de la empresa
-- Sector / industria (input libre)
-- Descripción corta (reemplaza "bio")
-- Ubicación
-- Teléfono
-- Email
-- Sitio web
-- Horario (texto libre, ej: "Lun–Vie 9:00–18:00")
+**Features (4)** — reemplazar los actuales por:
+1. **Perfil digital** — Tu tarjeta de presentación online con foto, bio, contacto y estilo propio.
+2. **Todas tus redes en un lugar** — Instagram, LinkedIn, TikTok, WhatsApp, web… un solo enlace.
+3. **Comparte al instante** — QR descargable o link corto. Sin apps, sin instalar nada.
+4. **Estadísticas reales** — Visitas a tu perfil y clics por enlace, con origen y ubicación.
 
-**Cambios UI:**
+Se eliminan menciones a NFC en toda la página (hero, features, cómo funciona, footer).
 
-- `ProfileEditor.tsx` → nueva rama de formulario cuando `cardStyle === 'company'` con esos campos. El avatar pasa a llamarse "Logo" en el copy.
-- `Dashboard.tsx` → agregar opción "Empresa" en el `Select` de estilo de tarjeta.
-- `ProfileCard.tsx` y `PublicMicrosite.tsx` → layout adaptado: muestra logo (cuadrado), nombre como título, sector como subtítulo, descripción, y los datos de contacto (ubicación, teléfono, email, web, horario) en una lista clara con íconos. Sin "@username" como protagonista.
+**Cómo funciona** — pasos actualizados:
+1. Crea tu perfil (foto, bio, contacto)
+2. Añade tus redes y enlaces
+3. Comparte tu QR o link
 
-**Persistencia:** los nuevos campos se guardan en la tabla `profiles` existente. Hace falta migración para añadir columnas `industry text`, `website text`, `business_hours text` (los demás ya existen). El campo `bio` se reutiliza como "descripción".
+## Tarjeta giratoria de ejemplo (flip card CSS)
 
-## 2. PDF tipado (premium, 1 documento)
+Nuevo bloque entre el Hero y Features (o dentro del Hero en columna derecha en desktop) mostrando una **tarjeta 3D que gira** al hover y automáticamente cada X segundos en móvil.
 
-Reemplazar el actual `cvUrl` plano por un documento con tipo:
+- **Cara frontal**: mock del microsite de Pulpy — avatar, nombre ("Ana Martín"), rol ("Diseñadora · Estudio Nova"), badge `@ana`, botón "Guardar contacto", 2-3 chips de redes (Instagram, LinkedIn, Web).
+- **Cara trasera**: QR grande centrado + texto "Escanea para ver mi perfil" + logo Pulpy pequeño.
+- **Animación**: técnica del artículo — contenedor con `perspective`, hijo con `transform-style: preserve-3d` y `transition: transform .8s`, caras con `backface-visibility: hidden` (una rotada `rotateY(180deg)`). Al hover del contenedor: `transform: rotateY(180deg)`. Además, animación keyframe suave que la gira sola cada ~6s en loop (pausable en hover para que el usuario controle).
+- Los estilos van en `src/index.css` con clases utilitarias (`.flip-card`, `.flip-card-inner`, `.flip-card-front`, `.flip-card-back`) para no chocar con Tailwind.
+- Usa tokens semánticos existentes (primary, card, border) — nada de colores hardcoded.
 
-- `documentUrl: string`
-- `documentType: 'cv' | 'catalog' | 'menu' | 'portfolio'`
-- `documentLabel?: string` (opcional, override del texto del botón)
+## Archivos a tocar
 
-**Migración:** añadir columnas `document_type text`, `document_label text` a `profiles`. Mantener `cv_url` renombrado lógicamente como `document_url` (o conservar `cv_url` por compatibilidad y leer/escribir desde ahí).
+- `src/pages/Index.tsx` — reescribir hero copy, features, steps, footer (quitar NFC) y añadir el componente `<FlipCardDemo />`.
+- `src/components/FlipCardDemo.tsx` — nuevo componente con la tarjeta giratoria (front + back), usa `Avatar`, `Badge`, `Button` de shadcn y un QR estático (imagen SVG inline o `qrcode.react` ya presente si existe; si no, un placeholder SVG).
+- `src/index.css` — añadir clases `.flip-card*` con perspective, preserve-3d, backface-visibility, keyframes `flip-loop` y `.flip-card:hover` que fuerza el flip manual.
 
-**UI editor (`CvUploader.tsx` → renombrar a `DocumentUploader.tsx`):**
-
-- Selector de tipo (CV, Catálogo, Menú, Portafolio) antes/después de subir.
-- Sigue bloqueado tras paywall premium (ya lo está el CV hoy según memoria).
-- Solo 1 documento activo; subir otro reemplaza el anterior y borra el archivo previo del bucket.
-- Etiqueta del botón se calcula del tipo: "Descargar CV", "Descargar catálogo", "Descargar menú", "Descargar portafolio". El usuario puede sobrescribir con `documentLabel`.
-
-**UI pública (`PublicMicrosite.tsx`):**
-
-- Botón actual "Descargar CV" pasa a usar `documentLabel || defaultLabelByType(documentType)` y el ícono cambia según tipo (FileText para CV/Portafolio, BookOpen para catálogo, UtensilsCrossed para menú).
-
-## 3. Defaults estilo Empresa
-
-Cuando el usuario cambia a `cardStyle: 'company'` por primera vez, sugerir tipo de documento `catalog` por defecto (no forzado).
-
-## Detalles técnicos
-
-**Migración SQL necesaria (te la doy para que la corras tú):**
-
-```sql
-alter table public.profiles
-  add column if not exists industry text,
-  add column if not exists website text,
-  add column if not exists business_hours text,
-  add column if not exists document_type text check (document_type in ('cv','catalog','menu','portfolio')),
-  add column if not exists document_label text;
-```
-
-No cambian RLS ni grants existentes.
-
-**Archivos a tocar:**
-
-- `src/components/ProfileEditor.tsx` — rama Empresa, nuevos inputs, copy "Logo".
-- `src/pages/Dashboard.tsx` — opción "Empresa" en Select + tipos ampliados.
-- `src/components/ProfileCard.tsx` — render variante company.
-- `src/components/public/PublicMicrosite.tsx` — render variante company + botón documento tipado.
-- `src/components/CvUploader.tsx` → renombrar a `DocumentUploader.tsx`, añadir selector de tipo.
-- `src/contexts/AuthContext.tsx` / cualquier hook de perfil — mapear nuevas columnas.
-- Tipos compartidos de `ProfileData` (donde estén declarados) — agregar `industry`, `website`, `businessHours`, `documentType`, `documentLabel`.
-
-**Fuera de alcance (no se toca):**
-
-- Sistema de temas, watermark, stats, admin.
-- Pago/paywall (se reutiliza `isPremium` para bloquear el documento, igual que hoy con el CV).
-- Mapa embebido en ubicación (solo texto).
+## Fuera de alcance
+- No se toca el dashboard, editor, microsite público, auth ni backend.
+- No se cambian tokens de diseño globales (colores, tipografía).
+- No se agrega i18n ni nuevas rutas.
