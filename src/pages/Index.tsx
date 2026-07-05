@@ -83,9 +83,6 @@ const Index = () => {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="text-base px-8">
-                  <a href="#example">Ver ejemplo</a>
-                </Button>
               </div>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mt-8 text-sm text-muted-foreground">
