@@ -106,9 +106,6 @@ const Index = () => {
                 <div className="absolute -inset-8 bg-primary/10 blur-3xl rounded-full" aria-hidden="true" />
                 <div className="relative">
                   <FlipCardDemo />
-                  <p className="mt-6 text-center text-xs text-muted-foreground">
-                    Pasa el cursor sobre la tarjeta para ver el QR
-                  </p>
                 </div>
               </div>
             </div>
