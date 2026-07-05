@@ -83,9 +83,6 @@ const Index = () => {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="text-base px-8">
-                  <a href="#example">Ver ejemplo</a>
-                </Button>
               </div>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 mt-8 text-sm text-muted-foreground">
@@ -109,9 +106,6 @@ const Index = () => {
                 <div className="absolute -inset-8 bg-primary/10 blur-3xl rounded-full" aria-hidden="true" />
                 <div className="relative">
                   <FlipCardDemo />
-                  <p className="mt-6 text-center text-xs text-muted-foreground">
-                    Pasa el cursor sobre la tarjeta para ver el QR
-                  </p>
                 </div>
               </div>
             </div>

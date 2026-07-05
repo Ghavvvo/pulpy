@@ -88,10 +88,9 @@ const Header = () => {
 
           {isLanding ? (
             <>
-              <Button variant="ghost" asChild>
+              <Button asChild size="sm" className="rounded-full">
                 <Link to="/login">Iniciar sesión</Link>
               </Button>
-
             </>
           ) : isAuthenticated && user ? (
             <>
