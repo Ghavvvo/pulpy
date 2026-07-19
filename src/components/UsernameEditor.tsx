@@ -99,7 +99,7 @@ const UsernameEditor = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
-          pulpy.app/<span className="font-medium text-foreground">{normalized || "tu-usuario"}</span>
+          pulpy.me/<span className="font-medium text-foreground">{normalized || "tu-usuario"}</span>
         </p>
         <p className="text-xs min-h-4">
           {status.kind === "current" && <span className="text-muted-foreground">Este es tu nombre actual.</span>}
@@ -128,7 +128,7 @@ const UsernameEditor = ({ embedded = false }: { embedded?: boolean } = {}) => {
       <CardHeader>
         <CardTitle className="text-lg">Nombre de usuario</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Define tu enlace público: <span className="font-medium text-foreground">pulpy.app/{normalized || "tu-usuario"}</span>
+          Define tu enlace público: <span className="font-medium text-foreground">pulpy.me/{normalized || "tu-usuario"}</span>
         </p>
       </CardHeader>
       <CardContent>{body}</CardContent>
