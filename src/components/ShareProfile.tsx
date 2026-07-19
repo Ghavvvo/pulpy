@@ -29,8 +29,6 @@ interface ShareProfileProps {
 const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
   const { user } = useAuth();
 
-const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
-  const { user } = useAuth();
 
   // URL bot-friendly: sirve OG per-perfil y redirige humanos al perfil real.
   // Se usa al compartir en canales sociales para que WhatsApp/X/LinkedIn/etc.
