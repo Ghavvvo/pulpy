@@ -1,9 +1,15 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { trackLinkClick, trackProfileView } from "@/lib/tracking";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+
+const buildOgImageUrl = (username?: string) =>
+  `${SUPABASE_URL}/functions/v1/og-image${username ? `?u=${encodeURIComponent(username)}` : ""}`;
 
 const PublicProfile = () => {
   const { username } = useParams();
@@ -191,23 +197,55 @@ END:VCARD`;
     );
   }
 
+  const canonicalUrl = `https://pulpy.me/${profile.username}`;
+  const ogImage = buildOgImageUrl(profile.username);
+  const isCompany = profile.cardStyle === "company";
+  const subtitle = isCompany
+    ? profile.industry || ""
+    : [profile.title, profile.company].filter(Boolean).join(" · ");
+  const pageTitle = subtitle ? `${profile.name} — ${subtitle}` : `${profile.name} — Pulpy`;
+  const pageDesc =
+    (profile.bio && profile.bio.slice(0, 155)) ||
+    (isCompany
+      ? `Conoce a ${profile.name} en Pulpy. Contacto, redes y enlaces en un solo lugar.`
+      : `Mira la tarjeta digital de ${profile.name} en Pulpy: redes, contacto y enlaces en un solo lugar.`);
+
   return (
-    <PublicMicrosite
-      profile={profile}
-      onDownloadVcf={handleDownloadVcf}
-      onLinkClick={(link) => {
-        if (!profile?.id || !profile?.username) return;
-        trackLinkClick({
-          profileId: profile.id,
-          username: profile.username,
-          linkId: link.id,
-          platform: link.platform,
-          label: link.label,
-          url: link.url,
-        });
-      }}
-      showWatermark={!profile.isPremium}
-    />
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:site_name" content="Pulpy" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content={ogImage} />
+      </Helmet>
+      <PublicMicrosite
+        profile={profile}
+        onDownloadVcf={handleDownloadVcf}
+        onLinkClick={(link) => {
+          if (!profile?.id || !profile?.username) return;
+          trackLinkClick({
+            profileId: profile.id,
+            username: profile.username,
+            linkId: link.id,
+            platform: link.platform,
+            label: link.label,
+            url: link.url,
+          });
+        }}
+        showWatermark={!profile.isPremium}
+      />
+    </>
   );
 };
 
