@@ -1,0 +1,7 @@
+project_id = "pulpy"
+
+[functions.og-image]
+verify_jwt = false
+
+[functions.profile-meta]
+verify_jwt = false
