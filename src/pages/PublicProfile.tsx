@@ -1,9 +1,15 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import PublicMicrosite from "@/components/public/PublicMicrosite";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { trackLinkClick, trackProfileView } from "@/lib/tracking";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+
+const buildOgImageUrl = (username?: string) =>
+  `${SUPABASE_URL}/functions/v1/og-image${username ? `?u=${encodeURIComponent(username)}` : ""}`;
 
 const PublicProfile = () => {
   const { username } = useParams();
