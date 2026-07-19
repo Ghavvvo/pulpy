@@ -89,6 +89,21 @@ END:VCARD`;
 
         if (error) throw error;
 
+        let isPremium = false;
+
+        if (profile && !profile.is_suspended) {
+          const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan, status, end_date')
+            .eq('user_id', profile.id)
+            .maybeSingle();
+
+          isPremium =
+            subscription?.plan === 'premium' &&
+            subscription?.status === 'active' &&
+            (!subscription?.end_date || new Date(subscription.end_date).getTime() > Date.now());
+        }
+
         if (profile?.is_suspended) {
           setProfile({ __suspended: true, username });
           return;
@@ -118,7 +133,7 @@ END:VCARD`;
             documentType: profile.document_type || undefined,
             documentLabel: profile.document_label || undefined,
             theme: profile.theme || undefined,
-            isPremium: profile.is_premium === true || profile.plan === 'premium' || profile.plan === 'pro',
+            isPremium,
             socialLinks: (profile.social_links || [])
               .sort((a: any, b: any) => a.display_order - b.display_order)
               .map((link: any) => ({
