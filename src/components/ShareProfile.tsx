@@ -29,6 +29,23 @@ interface ShareProfileProps {
 const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
   const { user } = useAuth();
 
+const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
+  const { user } = useAuth();
+
+  // URL bot-friendly: sirve OG per-perfil y redirige humanos al perfil real.
+  // Se usa al compartir en canales sociales para que WhatsApp/X/LinkedIn/etc.
+  // muestren la preview correcta. Al copiar se mantiene la URL bonita.
+  const shareUrl = (() => {
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+      const username = user?.username;
+      if (!supabaseUrl || !username) return profileUrl;
+      return `${supabaseUrl}/functions/v1/profile-meta?u=${encodeURIComponent(username)}`;
+    } catch {
+      return profileUrl;
+    }
+  })();
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl);
     toast({
