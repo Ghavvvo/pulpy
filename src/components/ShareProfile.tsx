@@ -57,7 +57,7 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
       try {
         await navigator.share({
           title: "Mi Tarjeta Digital Pulpy",
-          url: profileUrl,
+          url: shareUrl,
         });
       } catch (error) {
         copyToClipboard();
@@ -86,7 +86,7 @@ const ShareProfile = ({ profileUrl, isPremium }: ShareProfileProps) => {
     | "viber";
 
   const openChannel = (channel: Channel) => {
-    const encodedUrl = encodeURIComponent(profileUrl);
+    const encodedUrl = encodeURIComponent(shareUrl);
     const encodedText = encodeURIComponent("Mira mi tarjeta digital Pulpy");
     const channels: Record<Channel, string> = {
       whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
