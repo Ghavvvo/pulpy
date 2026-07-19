@@ -61,6 +61,47 @@ interface SignupData {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const saveSocialLinks = async (userId: string, links: SocialLink[]) => {
+  const { data: existing } = await supabase
+    .from('social_links')
+    .select('id')
+    .eq('user_id', userId);
+
+  const dbIds = new Set((existing || []).map((l: any) => l.id));
+
+  const toUpdate = links.filter(l => l.id && dbIds.has(l.id));
+  const toInsert = links.filter(l => !l.id || !dbIds.has(l.id));
+  const toDelete = [...dbIds].filter(id => !links.some(l => l.id === id));
+
+  for (const link of toUpdate) {
+    await supabase
+      .from('social_links')
+      .update({
+        platform: link.platform,
+        url: link.url,
+        label: link.label,
+        display_order: links.indexOf(link),
+      })
+      .eq('id', link.id);
+  }
+
+  if (toInsert.length > 0) {
+    const newLinks = toInsert.map(link => ({
+      user_id: userId,
+      platform: link.platform,
+      url: link.url,
+      label: link.label || link.platform,
+      display_order: links.indexOf(link),
+    }));
+
+    await supabase.from('social_links').insert(newLinks);
+  }
+
+  if (toDelete.length > 0) {
+    await supabase.from('social_links').delete().in('id', toDelete);
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -284,41 +325,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (profileError) throw profileError;
 
-      // Handle social links updates
       if (data.socialLinks) {
-        const { data: existing } = await supabase
-          .from('social_links')
-          .select('id')
-          .eq('user_id', user.id);
-
-        const dbIds = new Set((existing || []).map((l: any) => l.id));
-        const incomingIds = new Set(
-          data.socialLinks.filter((l) => l.id && dbIds.has(l.id)).map((l) => l.id!)
-        );
-
-        // Delete removed links
-        const toDelete = [...dbIds].filter((id) => !incomingIds.has(id));
-        if (toDelete.length > 0) {
-          await supabase.from('social_links').delete().in('id', toDelete);
-        }
-
-        // Upsert existing + insert new
-        const linksToSave = data.socialLinks.map((link, index) => ({
-          ...(link.id && dbIds.has(link.id) ? { id: link.id } : {}),
-          user_id: user.id,
-          platform: link.platform,
-          url: link.url,
-          label: link.label,
-          display_order: index,
-        }));
-
-        if (linksToSave.length > 0) {
-          const { error: linksError } = await supabase
-            .from('social_links')
-            .upsert(linksToSave);
-
-          if (linksError) throw linksError;
-        }
+        await saveSocialLinks(user.id, data.socialLinks);
       }
 
       // Refresh user data
