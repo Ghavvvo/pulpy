@@ -28,7 +28,7 @@ const PulpyWatermark = ({ variant = "card" }: PulpyWatermarkProps) => {
       target="_blank"
       rel="noopener noreferrer"
       title="Hecho con Pulpy"
-      className="absolute bottom-3 right-3 z-10 inline-flex flex-col items-center gap-0.5 opacity-80 hover:opacity-100 transition-opacity"
+      className="absolute bottom-3 right-3 z-10 inline-flex flex-col items-center gap-0.5 opacity-100"
     >
       <img src={logo} alt="Pulpy" className="w-7 h-7 object-contain" />
       <span className="text-[9px] leading-none font-medium text-muted-foreground whitespace-nowrap">
