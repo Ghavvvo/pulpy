@@ -5,9 +5,7 @@ export default async function handler(context) {
   const userAgent = request.headers.get('user-agent') || '';
   const path = url.pathname;
 
-  console.log('🔹 Edge Function ejecutada');
-  console.log('📥 Path:', path);
-  console.log('📥 User-Agent:', userAgent);
+  console.log('🔹 Edge Function ejecutada:', path);
 
   // 1. Ignorar archivos estáticos
   if (path.match(/\.(jpg|jpeg|png|gif|svg|ico|webp|css|js|json|map)$/)) {
@@ -25,41 +23,30 @@ export default async function handler(context) {
     return context.next();
   }
 
-  // 4. Extraer el username de la ruta
-  const username = path.slice(1); // Elimina la primera /
-  console.log('👤 Username extraído:', username);
-
-  // 5. Validar que sea un username válido
+  // 4. Extraer el username
+  const username = path.slice(1);
   if (!/^[a-z0-9_-]{1,40}$/.test(username)) {
-    console.log('❌ Username inválido:', username);
     return context.next();
   }
 
-  // 6. Detectar si es un bot
+  // 5. Detectar si es un bot
   const isBot = /bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin|facebookexternalhit|facebot/i.test(userAgent);
-  console.log('🤖 Es bot:', isBot);
+  console.log('🤖 Es bot:', isBot, 'Username:', username);
 
-  // 7. Si es un bot, redirigir a profile-meta
+  // 6. Si es bot, redirigir a profile-meta
   if (isBot) {
     const metaUrl = `https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=${username}`;
-    console.log('🔗 Fetching profile-meta:', metaUrl);
-
     try {
       const response = await fetch(metaUrl);
       const html = await response.text();
-
       return new Response(html, {
-        headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-          'Cache-Control': 'public, max-age=3600'
-        }
+        headers: { 'Content-Type': 'text/html; charset=utf-8' }
       });
     } catch (error) {
-      console.error('❌ Error al obtener profile-meta:', error);
+      console.error('Error:', error);
       return context.next();
     }
   }
 
-  // 8. Para humanos, servir la app React
   return context.next();
 }
