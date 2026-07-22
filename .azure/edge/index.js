@@ -5,48 +5,61 @@ export default async function handler(context) {
   const userAgent = request.headers.get('user-agent') || '';
   const path = url.pathname;
 
-  // 1. Ignorar archivos estáticos (assets, imágenes, etc.)
+  console.log('🔹 Edge Function ejecutada');
+  console.log('📥 Path:', path);
+  console.log('📥 User-Agent:', userAgent);
+
+  // 1. Ignorar archivos estáticos
   if (path.match(/\.(jpg|jpeg|png|gif|svg|ico|webp|css|js|json|map)$/)) {
     return context.next();
   }
 
-  // 2. Ignorar rutas específicas de la app (login, signup, etc.)
+  // 2. Ignorar rutas específicas de la app
   const appRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/admin'];
   if (appRoutes.includes(path)) {
     return context.next();
   }
 
-  // 3. Detectar si es un bot
+  // 3. Si es la raíz, servir la app React
+  if (path === '/') {
+    return context.next();
+  }
+
+  // 4. Extraer el username de la ruta
+  const username = path.slice(1); // Elimina la primera /
+  console.log('👤 Username extraído:', username);
+
+  // 5. Validar que sea un username válido
+  if (!/^[a-z0-9_-]{1,40}$/.test(username)) {
+    console.log('❌ Username inválido:', username);
+    return context.next();
+  }
+
+  // 6. Detectar si es un bot
   const isBot = /bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin|facebookexternalhit|facebot/i.test(userAgent);
+  console.log('🤖 Es bot:', isBot);
 
-  // 4. Si es un bot y la ruta es un posible username
-  if (isBot && path !== '/' && path.length > 1) {
-    // Extraer el username (eliminar la primera /)
-    const username = path.slice(1);
+  // 7. Si es un bot, redirigir a profile-meta
+  if (isBot) {
+    const metaUrl = `https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=${username}`;
+    console.log('🔗 Fetching profile-meta:', metaUrl);
 
-    // Validar que sea un username válido
-    if (/^[a-z0-9_-]{1,40}$/.test(username)) {
-      const metaUrl = `https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=${username}`;
+    try {
+      const response = await fetch(metaUrl);
+      const html = await response.text();
 
-      try {
-        const response = await fetch(metaUrl);
-        const html = await response.text();
-
-        return new Response(html, {
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'public, max-age=3600'
-          }
-        });
-      } catch (error) {
-        console.error('Error al obtener profile-meta:', error);
-        // Si falla, continuar con la app React
-        return context.next();
-      }
+      return new Response(html, {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error al obtener profile-meta:', error);
+      return context.next();
     }
   }
 
-  // 5. Para humanos, servir la app React normalmente
+  // 8. Para humanos, servir la app React
   return context.next();
 }
-
