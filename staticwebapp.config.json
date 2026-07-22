@@ -25,12 +25,13 @@
       "rewrite": "/index.html"
     },
     {
-      "route": "/dashboard",
-      "rewrite": "/index.html"
-    },
-    {
       "route": "/:username",
-      "rewrite": "/api/edge"
+      "methods": ["GET"],
+      "headers": {
+        "User-Agent": "bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin|facebookexternalhit"
+      },
+      "redirect": "https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=:username",
+      "statusCode": 301
     }
   ],
   "navigationFallback": {
