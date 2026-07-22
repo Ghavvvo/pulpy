@@ -1,64 +1,13 @@
 {
   "routes": [
     {
-      "route": "/",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/login",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/signup",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/forgot-password",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/reset-password",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/pricing",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/admin",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/:username",
-      "methods": ["GET"],
-      "headers": {
-        "User-Agent": "bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin"
-      },
-      "rewrite": "https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=:username"
-    },
-    {
-      "route": "/:username/*",
-      "methods": ["GET"],
-      "headers": {
-        "User-Agent": "bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin"
-      },
-      "rewrite": "https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=:username"
+      "route": "/*",
+      "rewrite": "/index.html",
+      "statusCode": 200
     }
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": [
-      "/assets/*",
-      "*.jpg",
-      "*.jpeg",
-      "*.png",
-      "*.svg",
-      "*.ico",
-      "*.webp",
-      "*.css",
-      "*.js",
-      "*.json",
-      "*.map"
-    ]
+    "exclude": ["/assets/*", "*.jpg", "*.jpeg", "*.png", "*.svg", "*.ico", "*.webp"]
   }
 }
