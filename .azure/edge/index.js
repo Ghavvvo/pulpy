@@ -7,46 +7,62 @@ export default async function handler(context) {
 
   console.log('🔹 Edge Function ejecutada para:', path);
 
-  // --- Lógica para ignorar archivos estáticos y rutas de la app (mantenerla) ---
-  if (path.match(/\.(jpg|jpeg|png|gif|svg|ico|webp|css|js|json|map)$/)) {
+  // 1. IGNORAR ARCHIVOS ESTÁTICOS (IMPORTANTE)
+  // Azure sirve estos archivos directamente sin pasar por la Edge Function
+  if (path.match(/\.(jpg|jpeg|png|gif|svg|ico|webp|css|js|json|map|txt|xml|pdf)$/)) {
+    console.log('⏭️ Archivo estático, continuar...');
     return context.next();
   }
-  const appRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/admin'];
+
+  // 2. IGNORAR RUTAS DE LA API DE AZURE
+  if (path.startsWith('/api/')) {
+    console.log('⏭️ Ruta de API, continuar...');
+    return context.next();
+  }
+
+  // 3. IGNORAR RUTAS ESPECÍFICAS DE LA APP
+  const appRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/admin', '/dashboard'];
   if (appRoutes.includes(path)) {
+    console.log('⏭️ Ruta de app, continuar...');
     return context.next();
   }
-  if (path === '/') {
-    return context.next();
-  }
-  // --- Fin de la lógica para ignorar ---
 
+  // 4. SI ES LA RAÍZ, SERVIR LA REACT APP
+  if (path === '/' || path === '') {
+    console.log('⏭️ Raíz, continuar...');
+    return context.next();
+  }
+
+  // 5. EXTRAER USERNAME
   const username = path.slice(1);
+  console.log('👤 Username extraído:', username);
+
+  // 6. VALIDAR USERNAME
   if (!/^[a-z0-9_-]{1,40}$/.test(username)) {
-    console.log('❌ Username inválido:', username);
+    console.log('❌ Username inválido, continuar...');
     return context.next();
   }
 
-  const isBot = /bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin|facebookexternalhit|facebot/i.test(userAgent);
-  console.log('🤖 Es bot:', isBot, 'Username:', username);
+  // 7. DETECTAR BOT
+  const isBot = /bot|crawl|spider|facebook|twitter|whatsapp|telegram|slack|discord|linkedin|facebookexternalhit|facebot|Googlebot|Bingbot|Slackbot|Discordbot/i.test(userAgent);
+  console.log('🤖 Es bot:', isBot);
 
+  // 8. SI ES BOT, REDIRIGIR A PROFILE-META
   if (isBot) {
     const metaUrl = `https://mbxwatemtkzjedmcxogn.supabase.co/functions/v1/profile-meta?u=${username}`;
-    console.log('🔗 Intentando obtener profile-meta de:', metaUrl);
+    console.log('🔗 Redirigiendo a profile-meta:', metaUrl);
+
     try {
       const response = await fetch(metaUrl);
-      console.log('📥 Respuesta de profile-meta:', response.status, response.statusText);
+      console.log('📥 Status de profile-meta:', response.status);
 
       if (!response.ok) {
-        console.error('❌ Error al obtener profile-meta:', response.status);
-        // Devuelve un error amigable o pasa al siguiente middleware
-        return new Response(`<h1>Error al obtener meta tags</h1><p>Status: ${response.status}</p>`, {
-          status: 500,
-          headers: { 'Content-Type': 'text/html' }
-        });
+        console.error('❌ Error en profile-meta:', response.status);
+        return context.next(); // Si falla, mostrar React app
       }
 
       const html = await response.text();
-      console.log('✅ HTML obtenido correctamente, devolviendo...');
+      console.log('✅ HTML obtenido, devolviendo...');
       return new Response(html, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
@@ -54,14 +70,12 @@ export default async function handler(context) {
         }
       });
     } catch (error) {
-      console.error('💥 Error crítico en fetch:', error.message);
-      return new Response(`<h1>Error en Edge Function</h1><p>${error.message}</p>`, {
-        status: 500,
-        headers: { 'Content-Type': 'text/html' }
-      });
+      console.error('💥 Error en fetch:', error.message);
+      return context.next(); // Si falla, mostrar React app
     }
   }
 
-  // Si no es bot, pasar al siguiente middleware (la React app)
+  // 9. PARA HUMANOS, SERVIR REACT APP
+  console.log('👤 Es humano, continuar...');
   return context.next();
 }

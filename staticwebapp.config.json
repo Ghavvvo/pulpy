@@ -1,12 +1,52 @@
 {
   "routes": [
     {
-      "route": "/*",
+      "route": "/login",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/signup",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/forgot-password",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/reset-password",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/pricing",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/admin",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/dashboard",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/:username",
       "rewrite": "/api/edge"
     }
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "*.jpg", "*.jpeg", "*.png", "*.svg", "*.ico", "*.webp"]
+    "exclude": [
+      "/assets/*",
+      "*.jpg",
+      "*.jpeg",
+      "*.png",
+      "*.svg",
+      "*.ico",
+      "*.webp",
+      "*.css",
+      "*.js",
+      "*.json",
+      "*.map"
+    ]
   }
 }
